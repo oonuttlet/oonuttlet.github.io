@@ -4,7 +4,7 @@
 
 ### Category Name 1 
 
-[Project 1 Title](/sample_page)
+[Sociospatial distribution of PurpleAir sensors in Maryland](/sample_page)
 <img src="images/it worked MHI.png?raw=true"/>
 
 ---
