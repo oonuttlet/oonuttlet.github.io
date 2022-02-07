@@ -1,0 +1,45 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Everything above this is the bare minimum */
+
+/* Everything below this is my own customizations */
+
+a {
+ color:#FA8072;
+}
+
+a:hover,
+a:focus {
+ color:#FF7F50;
+}
+a small {
+ color:#FF7F50;
+}
+a:hover small {
+ color:#FF7F50
+}
+
+/* body means everything, the default for the page */
+body {
+ font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+ font-size: 105%;
+}
+
+/* these are the headers */
+h1, h2, h3, h4, h5, h6 {
+ letter-spacing: -0.08em;
+}
+
+
+header h1 a {
+ font-size: 1.2em;
+ color: #34ebd8;
+}
+
+header h1 a:hover {
+ font-size: 1.2em;
+ color: "red";
+}
