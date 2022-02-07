@@ -13,13 +13,13 @@ a {
 
 a:hover,
 a:focus {
- color:#FF7F50;
+ color:#FFA07A;
 }
 a small {
  color:#FF7F50;
 }
 a:hover small {
- color:#FF7F50
+ color:#FFA07A
 }
 
 /* body means everything, the default for the page */
@@ -36,10 +36,21 @@ h1, h2, h3, h4, h5, h6 {
 
 header h1 a {
  font-size: 1.2em;
+ color: #FF7F50;
+}
+
+header h1 a:hover {
+ font-size: 1.2em;
+ color: #FFA07A;
+}
+
+header h2 a {
+ font-size: 1.2em;
  color: #2165ac;
 }
 
 header h1 a:hover {
  font-size: 1.2em;
- color: #FF7F50;
+ color: #92c6de;
 }
+
