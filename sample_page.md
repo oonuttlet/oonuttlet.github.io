@@ -1,4 +1,4 @@
-## This can be your internal website page / project page
+## Sociospatial distribution of PurpleAir sensors in Maryland
 
 **Project description:** Using Python scripting and GIS packages, maps were developed to find the differences in where someone lives and where their nearest air quality sensor is.
 
