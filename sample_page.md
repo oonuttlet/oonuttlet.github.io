@@ -16,7 +16,7 @@ Python was used to pull the location of PurpleAir sensors for Maryland and surro
 
 ### 3. Support the selection of appropriate statistical tools and techniques
 
-<img src="images/it worked MHI.png" width="2500" height="2500" />
+<img src="images/it worked MHI.png" width="2500" />
 
 ### 4. Provide a basis for further data collection through surveys or experiments
 
