@@ -14,5 +14,3 @@ scipy's cKDTree was used to perform a nearest-neighbor analysis between census t
 ### Differences were found.
 
 <img src="../../dss/it worked MHI.png?raw=true"/> <br> Particularly in west Baltimore, it was found that there were large differences between the tract in which someone lived and the tract where their nearest sensor was located (designated in red).
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
