@@ -4,7 +4,7 @@
 
 ### [Mapping Capital](https://mapping.capital)
 
-[Sociospatial distribution of PurpleAir sensors in Maryland](/sample_page)
+[Sociospatial distribution of PurpleAir sensors in Maryland](/dss/purple)
 <img src="images/it worked MHI.png?raw=true"/>
 
 ---
