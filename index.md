@@ -8,8 +8,9 @@
 <img src="images/it worked MHI.png?raw=true"/>
 
 ---
-[GES 486 Lab 2](/lab_2/md/lab_2_exercise.html)\n
-<img src="images/dummy_thumbnail.jpg?raw=true"/>
+### UMBC
+[GES 486 Lab 2](/lab_2/md/lab_2_exercise.html)
+<img src="lab_2/images/mn_pop_pyrmaid.png?raw=true"/>
 
 ---
 [Project 3 Title](http://example.com/)
