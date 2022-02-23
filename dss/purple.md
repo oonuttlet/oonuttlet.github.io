@@ -8,7 +8,7 @@ Underserved communities across the country are often overlooked by the EPA's AQS
 
 Brands like PurpleAir and IQAir offer a simple, all-in-one package to track various air quality metrics such as PM2.5, ground-level ozone, and oxides, while modular, open-source kits exist for the more tech-savvy built on platforms such as Arduino and Raspberry Pi. Many of these options can be configured to output AQI, depending on the types of data collected. These sensors cost between $100 and $5,000 depending on the options selected. Though this is orders of magnitude less expensive than the regulation-grade monitors, these prices are still prohibitive to lower-income households.
 
-<img src="../../images/distro.png?raw=true"/>
+<img src="../distro.png?raw=true"/>
 
 ### 2. How did we do this?
 
@@ -16,7 +16,7 @@ Python was used to pull the location of PurpleAir sensors for Maryland and surro
 
 ### 3. What did we see?
 
-<img src="../../images/it worked MHI.png" width="500" />
+<img src="../images/it worked MHI.png" width="500" />
 
 Tracts seen in red are those with a lower MHI than the closest PurpleAir sensor to their location. Blue tracts have a higher MHI than their closest sensor location.
 
