@@ -8,7 +8,7 @@
 <img src="images/it worked MHI.png?raw=true"/>
 
 ---
-[Project 2 Title](/pdf/sample_presentation.pdf)
+[GES 486 Lab 2](/lab_2/md/lab_2_exercise.html)
 <img src="images/dummy_thumbnail.jpg?raw=true"/>
 
 ---
