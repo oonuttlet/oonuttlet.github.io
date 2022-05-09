@@ -1,0 +1,48 @@
+---
+title: "flow_map"
+author: "Harrison DeFord"
+date: '2022-05-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(geojsonsf)
+library(jsonlite)
+library(httr)
+library(sf)
+library(tibble)
+library(lubridate)
+library(tidycensus)
+library(tigris)
+library(stringr)
+library(dplyr)
+library(tmap)
+library(mapdeck)
+library(lwgeom)
+tmap_options(check.and.fix = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+options(tigris_use_cache = TRUE)
+```
+
+```{r}
+flow_lines <- st_read("G:/My Drive/GES486/final_proj/results/trip_id_p2p.shp")
+trip_id_long <- st_read("G:/My Drive/GES486/final_proj/results/trip_id_long.gpkg")
+flow_lines_proj <- flow_lines %>% st_transform(4326)
+```
+
+```{r}
+flow_tabular <- flow_lines %>% st_drop_geometry()
+```
+
+```{r}
+flow_lines$start_geom <- st_startpoint(flow_lines)
+flow_lines$end_geom <- st_endpoint(flow_lines)
+flow_lines_proj$start_geom <- st_startpoint(flow_lines_proj)
+flow_lines_proj$end_geom <- st_endpoint(flow_lines_proj)
+```
+
+```{r}
+flow_lines <- flow_lines %>% mutate(dist = st_length(geometry))
+summarise(flow_lines, mean = mean(dist))
+saveRDS(object = flow_lines, file = "G:/My Drive/GES486/final_proj/results/flow_lines.RDS")
+```
