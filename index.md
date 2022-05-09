@@ -13,7 +13,7 @@
 <img src="lab_2/images/mn_pop_pyrmaid.png?raw=true"/>
 
 ---
-[GES 486 Final Project](/finalproj/hexagons.html)
+[GES 486 Final Project](/finalproj/md/hexagons.html)
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png"/>
 
 ---
