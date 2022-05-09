@@ -14,7 +14,7 @@
 
 ---
 [GES 486 Final Project](/finalproj/hexagons.html)
-<img src="images/dummy_thumbnail.jpg?raw=true"/>
+<img src="finalproj/images/Screenshot 2022-05-09 131724.png"/>
 
 ---
 
