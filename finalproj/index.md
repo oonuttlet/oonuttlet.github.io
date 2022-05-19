@@ -1,7 +1,7 @@
 ## GES 486 Final Project Scripts
 
 ---
-These three scripts are data preparation and manipulation scripts:
+[These](/finalproj/md/) three scripts are data preparation and manipulation scripts:
 
 [Script 1](/finalproj/md/start_end_join.html)
 
