@@ -14,3 +14,7 @@ This final script produces HTML widgets, which are interactive in 3 dimensions, 
 [Script 4](/finalproj/md/hexagons.html)
 
 ---
+
+[This HTML](/finalproj/md/scooter_locations.html) is what I presented in class, and incorporates elements from all of the above scripts.
+
+It uses data collected the week of 05/01/2022 through 05/07/2022 to output maps on scooter locations compared to BIPOC population and job and population location.
