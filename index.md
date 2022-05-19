@@ -9,10 +9,12 @@
 
 ---
 ### UMBC
+
 [GES 486 Lab 2](/lab_2/md/lab_2_exercise.html)
 <img src="lab_2/images/mn_pop_pyrmaid.png?raw=true" width = "50%" height = "50%"/>
 
 ---
+
 [GES 486 Final Project](/finalproj/index.md)
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
 
