@@ -5,9 +5,7 @@
 ### [Mapping Capital](https://mapping.capital)
 
 [Sociospatial distribution of PurpleAir sensors in Maryland](/dss/purple.md) <br/>
-<p><a href="/dss/purple.md">
 <img src="images/it worked MHI.png?raw=true" width = "50%" height = "50%"/>
-</a></p>
 
 ---
 ### UMBC
@@ -20,9 +18,7 @@
 ---
 
 [GES 486 Final Project](/finalproj/index.md) <br/>
-<p><a href="/finalproj/index.md">
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
-</a></p>
 
 
 ---
