@@ -16,8 +16,8 @@ For this analysis, I've coined a new unit: people-points. Represented by the tot
 
 Here are the resulting maps, made in `ggplot2` and arranged using `patchwork`:
 
-<img src="/finalproj/images/layout1.png"></n>
-<img src="/finalproj/images/layout2.png">
+<img src="/finalproj/images/layout1.png" width = "100%" height = "100%">
+<img src="/finalproj/images/layout2.png" width = "100%" height = "100%">
 
 We can see that, during a week of morning commuting (Monday - Monday), the areas with the most scooter trips per person-point are in Locust Point and the Inner Harbor. More specifically, the two yellowest polygons, which represent the hexes with the highest proportion of trips per person-point, contain the Under Armour main campus. Notably, areas with high percentages of BIPOC individuals are almost all dark purple, showing few numbers of scooter trips per person-point.
 
