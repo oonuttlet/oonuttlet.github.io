@@ -20,7 +20,7 @@
 ---
 
 [GES 486 Final Project](/finalproj/index.md) <br/>
-<p><a href="finalproj/index.md">
+<p><a href="/finalproj/index.md">
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
 </a></p>
 
