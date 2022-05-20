@@ -9,7 +9,7 @@ These three scripts are data preparation and manipulation scripts:
 
 [Script 3](/finalproj/md/flow_diagram.html)
 
-This final script produces HTML widgets, which are interactive in 3 dimensions, to smybolize scooter flows
+This final script produces HTML widgets, which are interactive in 3 dimensions, to smybolize scooter flows. It only uses data collected on May 1, 2022 (due to hardware restraints).
 
 [Script 4](/finalproj/md/hexagons.html)
 
