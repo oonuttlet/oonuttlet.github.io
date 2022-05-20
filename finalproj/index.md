@@ -8,7 +8,7 @@ As the 'dockless' name implies, these scooters have nowhere to call home: they'r
 
 These zones are relatively small compared to the size of the city boundary: do they make scooter distribution truly equitable? Using the vendors' public API endpoints (another requirement for operation within the city), data was (and is being) collected on scooter locations every fifteen minutes. For this project, I only analyzed times between 6:00 am and 10:00 am for the week of May 1, 2022 and May 7, 2022; but the potential is there for much more detailed analysis.
 
-The python script which queries the API endpoints for all three vendors is currently running on [Mapping Capital](https://mapping.capital), and all other analysis was done using R statistical software. The scripts I used to manipulate the data collected can be found [here](/finalproj/scripts.md).
+The python script which queries the API endpoints for all three vendors is currently running on [Mapping Capital](https://mapping.capital), and all other analysis was done using R statistical software. The scripts I used to manipulate the data collected can be found [here](https://github.com/oonuttlet/oonuttlet.github.io/blob/0c9ff144c0b63c28a35dd392372f0a4beeb60164/finalproj/scripts.md).
 
 ## Results
 
