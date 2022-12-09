@@ -10,9 +10,9 @@
 ---
 ### UMBC
 
-[GES 486 Lab 2](/lab_2/md/lab_2_exercise.html) <br/>
-<p><a href="/lab_2/md/lab_2_exercise.html">
-<img src="lab_2/images/mn_pop_pyrmaid.png?raw=true" width = "50%" height = "50%"/>
+[The Great Shrinking Lake](/381_proj) <br/>
+<p><a href="/381_proj">
+<img src="381_proj/images/true_color.gif" width = "50%" height = "50%"/>
 </a></p>
 
 ---
