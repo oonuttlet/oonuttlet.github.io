@@ -17,5 +17,5 @@
 
 ---
 
-[GES 486 Final Project](/finalproj/index.md) <br/>
+[Micromobility in Baltimore](/finalproj/index.md) <br/>
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
