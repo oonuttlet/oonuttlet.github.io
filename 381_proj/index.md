@@ -5,7 +5,7 @@ This presentation was given as my final project for my remote sensing course at 
 
 The report was limited in scope due to limited time to work: obviously, there are more factors contributing to a shrinking lake area than just population growth. However, in USGS's 2015 [Circular 1441]("https://pubs.er.usgs.gov/publication/cir1441") ranked Utah second of all states in per capita domestic water usage, so to say that the population of the Valley is not a major reason the Lake is losing water yearly would be undeniably false.
 
-Linear correlation tests run in R yielded a significantly negative correlation of $y ~ 0.0016x$ and an R-squared value of $0.78$ ($p << 0.001$). In context, according to this model, for every 100,000 people that move to the Salt Lake area, $160 km^2$ of water surface are lost. 
+Linear correlation tests run in R yielded a significantly negative correlation of $y ~ 0.0016x$ and an R-squared value of $0.78$ ( $p << 0.001$ ). In context, according to this model, for every 100,000 people that move to the Salt Lake area, $160 km^2$ of water surface are lost. 
 
 <object data="/381_proj/gsl_ppt.pdf" type="application/pdf" width="700px" height="700px"/>
 
