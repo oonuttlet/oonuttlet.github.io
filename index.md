@@ -19,8 +19,3 @@
 
 [GES 486 Final Project](/finalproj/index.md) <br/>
 <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
-
-
----
-<p style="font-size:11px">Page template forked from <a href="https://github.com/evanca/quick-portfolio">evanca</a></p>
-<!-- Remove above link if you don't want to attibute -->
