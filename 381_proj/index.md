@@ -7,7 +7,7 @@ The report was limited in scope due to limited time to work: obviously, there ar
 
 Linear correlation tests run in R yielded a significantly negative correlation of y ~ 0.0016x and an R-squared value of 0.78 (*p* << 0.001). In context, according to this model, for every 100,000 people that move to the Salt Lake area, 160 km<sup>2</sup> of water surface are lost. 
 
-The R scripts for this report are available [here]("/381_proj/src") and the Earth Engine code is available [here](https://code.earthengine.google.com/5f7c5dd52c2292d35cbd8dc426d87578).
+The R scripts for this report are available [here]("/src") and the Earth Engine code is available [here](https://code.earthengine.google.com/5f7c5dd52c2292d35cbd8dc426d87578).
 
 <object data="/381_proj/gsl_ppt.pdf" type="application/pdf" width="700px" height="700px"/>
 
