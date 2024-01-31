@@ -4,7 +4,7 @@
 
 ### UMBC
 
-[GES680](/GES680)
+[GES680](/GES680/index.md)
 
 [The Great Shrinking Lake](/381_proj) <br/>
 <p><a href="/381_proj">
