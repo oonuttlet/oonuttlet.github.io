@@ -58,8 +58,6 @@ header h2 a:hover {
     display: flex;
     flex-direction: row;
     align-items:flex-end;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 105%;
   }
   
 .flex-container > div {
@@ -67,6 +65,8 @@ header h2 a:hover {
     margin: 0px;
     padding: 0px;
     font-size: 30px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 105%;
   }
   
 figure {
