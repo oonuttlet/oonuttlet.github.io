@@ -13,7 +13,7 @@
   </div>
   <div>
     <figure>
-      <a href="/finalproj/index.md"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "maxwidth:55vw"></a>
+      <a href="/finalproj/index.md"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "maxwidth:35vw"></a>
             <figcaption><a href="/finalproj/index.md">Micromobility in Baltimore</a></figcaption>
     </figure>
   </div>
@@ -27,7 +27,7 @@
   <div>
     <figure>
       <a href="/dss/purple.md">
-        <img src="images/it worked MHI.png?raw=true" style = "maxwidth:100vw;">
+        <img src="images/it worked MHI.png?raw=true" style = "maxwidth:55vw;">
       </a>
       <figcaption> 
         <a href="/dss/purple.md">Sociospatial distribution of PurpleAir sensors in Maryland</a>
