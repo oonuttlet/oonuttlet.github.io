@@ -27,7 +27,6 @@ figure figcaption {
 }
 </style>
 </head>
-<body>
 
 ## Portfolio
 
