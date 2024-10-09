@@ -1,3 +1,5 @@
+<link href="/assets/style.scss" rel="stylesheet"></link>
+
 ## Portfolio
 
 ---
