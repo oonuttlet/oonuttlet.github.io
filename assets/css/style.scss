@@ -62,9 +62,10 @@ header h2 a:hover {
 }
 
 .flex-container {
-    display: flex;
+    display:flex;
     flex-direction: row;
-    align-items:flex-end;
+    align-items:baseline;
+    justify-content:center;
   }
   
 .flex-container > div {
