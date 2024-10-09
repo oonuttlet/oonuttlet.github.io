@@ -1,4 +1,4 @@
-<html>
+<!-- <html>
 <head>
 <style>
 .flex-container {
@@ -26,7 +26,7 @@ figure figcaption {
     text-align: center;
 }
 </style>
-</head>
+</head> -->
 
 ## Portfolio
 
