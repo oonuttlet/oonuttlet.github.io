@@ -4,6 +4,7 @@
 
 ### UMBC
 
+<<<<<<< HEAD
 <div id="image-table" style="text-align: center; vertical-align: middle;">
     <table style="height:120%;width:120%;">
         <tr>
@@ -19,6 +20,12 @@
         </tr>
     </table>
 </div>
+=======
+[The Great Shrinking Lake](/381_proj)
+<p><a href="/381_proj">
+<img src="381_proj/images/true_color.gif" width = "50%" height = "50%"/>
+</a></p>
+>>>>>>> parent of 1783be1 (testing formatting index.md)
 
 ---
 ---
