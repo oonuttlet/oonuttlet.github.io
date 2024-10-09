@@ -9,7 +9,6 @@
 <img src="381_proj/images/true_color.gif" width = "50%" height = "50%"/>
 </a>
 
----
 
 [Micromobility in Baltimore](/finalproj/index.md)
 <a href="/finalproj"> <br/>
