@@ -8,12 +8,11 @@
     <table style="height:120%;width:120%;">
         <tr>
         <td>
-            <a href = /381_proj>The Great Shrinking Lake</a> <br/>
+            [The Great Shrinking Lake](/381_proj) <br/>
             <p><a href="/381_proj"><img src="381_proj/images/true_color.gif" width = "60%" height = "70%"/></a></p>
         </td>
         <td>
-            <a href = /finalproj/index.md>Micromobility in Baltimore</a> <br/>
-            <p><a href="/finalproj/index.md">
+            [Micromobility in Baltimore](/finalproj/index.md) <br/>
             <img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
             </a></p>
         </td>
