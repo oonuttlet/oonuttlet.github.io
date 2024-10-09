@@ -19,7 +19,7 @@
 
 ---
 
-<h3> <a href="https://mapping.capital">Mapping Capital</h3>
+<h3> <a href="https://mapping.capital">Mapping Capital</a></h3>
 
 <div>
   <div>
