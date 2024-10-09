@@ -44,8 +44,8 @@ figure figcaption {
   </div>
   <div>
     <figure>
-      <a href="/finalproj/index.md"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "width: 100vw;">
-            <figcaption> <a href="/381_proj"><b>Micromobility in Baltimore</b></a> </figcaption>
+      <a href="/finalproj/index.md"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "width: 100vw;"></a>
+            <figcaption><a href="/finalproj/index.md"><b>Micromobility in Baltimore</b></a></figcaption>
     </figure>
   </div>
 </div>
