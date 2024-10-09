@@ -1,4 +1,4 @@
-<h1 style="letter-spacing:0.5em;text-align:center;"> PORTFOLIO </h1>
+<h1 style="letter-spacing:0.5em;text-align:center;">PORTFOLIO</h1>
 
 <h3 style="text-align:center"> UMBC </h3>
 
