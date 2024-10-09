@@ -11,7 +11,7 @@
   </div>
   <div>
     <figure>
-      <a href="/finalproj"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "maxwidth:35vw;margin-right:auto"></a>
+      <a href="/finalproj"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "maxwidth:35vw;"></a>
             <figcaption><a href="/finalproj">Micromobility in Baltimore</a></figcaption>
     </figure>
   </div>
