@@ -53,3 +53,27 @@ header h2 a:hover {
  font-size: 1.2em;
  color: #92c6de;
 }
+
+.flex-container {
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+  }
+  
+.flex-container > div {
+    background-color: #f1f1f1;
+    margin: 0px;
+    padding: 0px;
+    font-size: 30px;
+  }
+  
+figure {
+    display: inline-block;
+    margin: 10px; /* adjust as needed */
+  }
+figure img {
+    vertical-align: top;
+  }
+figure figcaption {
+    text-align: center;
+  }
