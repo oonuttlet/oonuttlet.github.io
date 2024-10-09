@@ -1,8 +1,6 @@
-## Portfolio
+<h2> Portfolio </h2>
 
----
-
-### UMBC
+<h3> UMBC </h3>
 
 <div class="flex-container">
   <div>
@@ -21,7 +19,7 @@
 
 ---
 
-### [Mapping Capital](https://mapping.capital)
+<h3> <a href="https://mapping.capital">Mapping Capital</h3>
 
 <div>
   <div>
@@ -35,7 +33,3 @@
     </figure>
   </div>
 </div>
-
-<!-- 
-[Sociospatial distribution of PurpleAir sensors in Maryland](/dss/purple.md) <br/>
-<a href="/finalproj/index.md"><img src="images/it worked MHI.png?raw=true" width = "50%" height = "50%"/></a> -->
