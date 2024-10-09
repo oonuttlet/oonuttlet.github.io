@@ -4,7 +4,7 @@
 
 ### UMBC
 
-[The Great Shrinking Lake](/381_proj) <br/>
+[The Great Shrinking Lake](/381_proj)
 <p><a href="/381_proj">
 <img src="381_proj/images/true_color.gif" width = "50%" height = "50%"/>
 </a></p>
