@@ -2,6 +2,7 @@
 ---
 
 @import "{{ site.theme }}";
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 /* Everything above this is the bare minimum */
 
@@ -33,6 +34,12 @@ h1, h2, h3, h4, h5, h6 {
  letter-spacing: -0.08em;
 }
 
+header h1 {
+ color: #FF7F50;
+ font-family:'Open Sans', 'Arial Narrow', Arial, sans-serif;
+ font-size:medium;
+ 
+}
 
 header h1 a {
  font-size: 1.2em;
