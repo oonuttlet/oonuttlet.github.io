@@ -4,16 +4,7 @@
 
 ### UMBC
 
-[The Great Shrinking Lake](/381_proj)
-<a href="/381_proj"> <br/>
-<img src="381_proj/images/true_color.gif" width = "50%" height = "50%"/>
-</a>
-
-
-[Micromobility in Baltimore](/finalproj/index.md)
-<a href="/finalproj"> <br/>
-<img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "50%" height = "50%"/>
-</a>
+[<img src="381_proj/images/true_color.gif" width = "32%" height = "30%"/> The Great Shrinking Lake](/381_proj/)[<img src="finalproj/images/Screenshot 2022-05-09 131724.png" width = "49.5%" height = "50%"/> Micromobility in Baltimore](/finalproj/index.md)
 
 ---
 
