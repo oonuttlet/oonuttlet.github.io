@@ -5,13 +5,13 @@
 <div class="flex-container">
   <div>
     <figure>
-    <a href="/381_proj"><img src="381_proj/images/true_color.gif" style = "maxheight:100vw;"></a>
+    <a href="/381_proj"><img src="381_proj/images/true_color.gif" style = "width:300px;"></a>
       <figcaption> <a href="/381_proj">The Great Shrinking Lake</a> </figcaption>
     </figure>
   </div>
   <div>
     <figure>
-      <a href="/finalproj"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "maxwidth:35vw;"></a>
+      <a href="/finalproj"><img src="finalproj/images/Screenshot 2022-05-09 131724.png" style = "width:300px;"></a>
             <figcaption><a href="/finalproj">Micromobility in Baltimore</a></figcaption>
     </figure>
   </div>
