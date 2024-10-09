@@ -26,11 +26,11 @@
 <div>
   <div>
     <figure>
-      <a href="/dss/purple.md">
+      <a href="/dss/index.md">
         <img src="images/it worked MHI.png?raw=true" style = "maxwidth:55vw; margin-right:auto;">
       </a>
       <figcaption> 
-        <a href="/dss/purple.md">Sociospatial distribution of PurpleAir sensors in Maryland</a>
+        <a href="/dss/index.md">Sociospatial distribution of PurpleAir sensors in Maryland</a>
       </figcaption>
     </figure>
   </div>
