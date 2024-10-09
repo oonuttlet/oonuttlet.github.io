@@ -7,7 +7,7 @@
 <div class="flex-container">
   <div>
     <figure>
-    <a href="/381_proj"><img src="381_proj/images/true_color.gif" style = "maxwidth:55vw;margin-right:auto;"></a>
+    <a href="/381_proj"><img src="381_proj/images/true_color.gif" style = "maxheight:100vw;margin-right:auto;"></a>
       <figcaption> <a href="/381_proj">The Great Shrinking Lake</a> </figcaption>
     </figure>
   </div>
