@@ -15,22 +15,3 @@ forklift certified; aspiring geographer
 
 # PORTFOLIO
 
-<!-- ## [UMBC](https://ges.umbc.edu/) -->
-
-<!-- #### *Remote Sensing* -->
-
-<!-- [The Great Shrinking Lake](posts/381_proj) -->
-
-<!-- #### *Transportation* -->
-
-<!-- [Micromobility in Baltimore](posts/finalproj) -->
-
-<!-- ------------------------------------------------------------------------ -->
-
-<!-- ## [Mapping Capital](https://mapping.capital) -->
-
-<!-- ------------------------------------------------------------------------ -->
-
-<!-- ## Personal Projects -->
-
-<!-- [Mean Centers of Population by Ethnicity](posts/center_of_pop/src) -->

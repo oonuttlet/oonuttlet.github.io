@@ -1,9 +1,25 @@
 ---
-title: "about"
+title: "about harrison"
+fig-cap-location: bottom
 ---
 
-About this site
+![](harrison.png){width=30%}
 
-```{r}
-1 + 1
-```
+My name is Harrison DeFord, and this website serves as a collection of documents showing my journey as I learn more about space, place, and what we can learn from them.
+
+I primarily write code in R, which I began learning in early 2022. I'm a geographer by training, but am also particularly interested in riding my bike (slowly), transportation and development in urban areas, and how geography shapes these topics.
+
+I'm currently a senior data analyst as part of the [BCSTAT](https://www.baltimorecountymd.gov/departments/bcstat) team in the Baltimore County Executive Office, where I serve as a spatial data guru, leading the development of internal and external tools, including the Social Determinants of Health (SDOH) [web experience](https://experience.arcgis.com/experience/48745860e33843ab8929ac587a745d96) and the Baltimore County [Food Pantry Locator](https://bc-gis.maps.arcgis.com/apps/instant/nearby/index.html?appid=2ec6ceb1732844bbb00a40ec1a0b733f). Working in the public sector is immensely fulfilling, and BCSTAT's unique position in the government structure means I have experience with all sorts of topics, including animal services, code enforcement, fire/EMS, tax credits, transportation, and more.
+
+I graduated from UMBC with a BS in Geography and Environmental Systems in December 2022, and have since returned as a graduate student pursuing my MS, again in Geography and Environmental Systems. At UMBC I've had the opportunity to work with several professors in a lab environment.
+
+| Professor | Laboratory | Research Topics | Dates |
+|-----------------|-----------------|--------------------|-----------------|
+| Dr. Dillon Mahmoudi | Mapping Capital | Air quality, Census data, micromobility, critical geography | Aug 2021 - Present |
+| Dr. Matthew Fagan | Earth from Above | Remote Sensing, Machine Learning, Reforestation | Aug 2022 - Mar 2022 |
+
+: The UMBC labs I've worked with
+
+During my time at UMBC, I've also had the chance to work with other organizations on various projects, including the Partnership for a Healthier America and UMBC's IS department as a Data Science Scholar.
+
+If you're interested in working with me on a project, please reach out at hdeford1 \[at\] umbc \[dot\] edu. I currently don't have much bandwidth, but am always willing to listen to new research ideas!
