@@ -1,0 +1,268 @@
+---
+title: "Centers of Population by Race/Ethnicity"
+author: "Harrison DeFord (hdeford1 at umbc dot edu)"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+---
+
+Every decennial census, the U.S. Census Bureau releases an updated version of the [Mean Center of Population](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.html), which can be interpreted as the "center of gravity" of the U.S. population. The goal of this project is to calculate the mean center of population *per ethnic group* captured in the decennial census.
+
+For simplification, the groups of interest in this analysis are:
+
+| Group |Census Sub-groups |
+|--|---|
+|Hispanic|"Hispanic or Latino"|
+|NH White|"Not Hispanic or Latino; White alone"|
+|NH African-American|"Not Hispanic or Latino; Black or African-American alone"|
+|NH American and Alaskan Native|"Not Hispanic or Latino; American Indian and Alaska Native alone"|
+|NH Asian|"Not Hispanic or Latino; Asian alone"|
+|NH Hawaiian and Pacific Islander|"Not Hispanic or Latino; Native Hawaiian and Other Pacific Islander alone"|
+|NH Other|"Not Hispanic or Latino; Some Other Race alone"|
+|NH Two or more|"Not Hispanic or Latino; Two or more races"|
+
+: {.striped .hover}
+
+# Libraries
+
+First, we'll load required libraries:
+
+```{r message = FALSE}
+library(tidyverse)
+library(tidycensus)
+library(tigris)
+library(sf)
+library(tmap)
+library(tmaptools)
+library(showtext)
+library(furrr)
+library(data.table)
+library(dtplyr)
+options(tigris_use_cache = TRUE)
+options(scipen = 999)
+extrafont::loadfonts(device = "win", quiet = T)
+
+rm(list = ls())
+yr = 2020
+```
+
+# Parallelization
+
+Since we're computing at the block level (11 million blocks) across 7 groups, we'll have a dataframe with over 70 million rows at its highest. I actually had to upgrade to 32GB of memory to run this analysis: we're going to create a `{furrr}` multisession using all but one of our CPU threads. In my case, that's 11 threads.
+
+```{r eval=F}
+fips_list <- unique(fips_codes$state)[1:51]
+num_cores <- availableCores()-1
+plan(multisession, workers = num_cores)
+```
+
+Now that our multisession is planned, we can start gathering our census data. The `{tidycensus}` package provides a fantastic interface to the USCB API, but at the block level we can only collect data one state at a time. However, by using `future_map()` to iterate over our list of state FIPS codes (`fips_list`) created earlier, we can gather 11 states worth of data simultaneously until we've obtained population counts for all 50 states, then `reduce()` them into one very long dataframe.
+
+# Census Data Collection
+
+Note that we gather tabular data (`b`) and spatial data (`c`) separately, to be stored in two different files on our machine. This code block takes my machine 20-30 minutes to run -- luckily, once you've run it once, you shouldn't have to run it again thanks to the power of `fwrite()`!
+
+```{r census_api, eval = F}
+## Not run:
+
+if (yr < 2020){
+  pop_vars <- c(white = "P005003",
+                black = "P005004",
+                aian = "P005005",
+                asian = "P005006",
+                hipi = "P005007",
+                other = "P005008",
+                two_p = "P005009",
+                hisp = "P005010")
+} else {
+  pop_vars <- c(white = "P2_005N",
+                black = "P2_006N",
+                aian = "P2_007N",
+                asian = "P2_008N",
+                hipi = "P2_009N",
+                other = "P2_010N",
+                two_p = "P2_011N",
+                hisp = "P2_002N")
+}
+
+b <- reduce(future_map(fips_list, function(x){
+  get_decennial(geography = "block", 
+                           variables = pop_vars,
+                           year = yr,
+                           state = x,
+                           output = "tidy",
+                           geometry = FALSE)}, .progress = TRUE), rbind)
+
+c <- reduce(future_map(fips_list, function(x){blocks(state = x, year = yr) %>%
+     st_drop_geometry() %>%
+     mutate(across(.cols = starts_with("INTPTLON"), .fns = as.numeric, .names = "lon")) %>%
+     mutate(across(.cols = starts_with("INTPTLAT"), .fns = as.numeric, .names = "lat")) %>%
+     select(c(5,last_col(offset = 1), last_col()))}, .progress = TRUE), rbind)
+
+future:::ClusterRegistry("stop")
+
+fwrite(as.data.table(b), paste0("../data/pop_data_", yr, ".csv"))
+fwrite(as.data.table(c), paste0("../data/latlon_", yr, ".csv"))
+
+## End(Not run)
+```
+
+# Calculations
+
+Now, we need to join our tables in order to weight the internal point of each block with its respective population. Note the usage of `{dtplyr}` here: I wanted to keep writing in tidyverse syntax while gaining the performance of `{data.table}`. What a fantastic package!
+
+The formula used is derived from [this document](https://www2.census.gov/geo/pdfs/reference/cenpop2020/COP2020_documentation.pdf). Since block-level population centers aren't available through `{tigris}`, we will use the "internal point" latitude and longitude. The internal point of a geography is often the centroid: if a geography is shaped such that the centroid would fall outside its boundary, the internal point is placed as close to the internal centroid of the geography as possible, preferably on land.
+
+```{r join, eval=FALSE}
+b <- lazy_dt(fread(paste0("../data/pop_data_", yr, ".csv")))
+c <- lazy_dt(fread(paste0("../data/latlon_", yr, ".csv")))
+o <- b %>%
+  pivot_wider(names_from = variable, values_from = value) %>%
+  mutate(other = other + two_p) %>%
+  select(-c(two_p)) %>%
+  pivot_longer(cols = 3:9, names_to = "variable")
+
+j <- left_join(o, c, by = c("GEOID" = paste0("GEOID", str_sub(yr, 3,4)))) %>%
+  mutate(elat = value * lat,
+         elon = value * lon * cos(lat * (pi/180)),
+         denom = value*cos(lat * (pi/180)))
+
+
+g <- j %>% 
+  group_by(variable) %>%
+  summarize(tlat = sum(elat, na.rm = TRUE)/sum(value, na.rm = TRUE),
+            tlon = sum(elon, na.rm = TRUE)/sum(denom, na.rm = TRUE),
+            pop = sum(value))
+
+cc <- as.data.table(j) %>%
+  summarize(tlat = sum(elat, na.rm = TRUE)/sum(value, na.rm = TRUE),
+            tlon = sum(elon, na.rm = TRUE)/sum(denom, na.rm = TRUE),
+            pop = sum(value))
+
+g <- as.data.table(g)
+```
+
+```{r echo = FALSE}
+g <- read.csv(paste0("../data/pop_data_summarized_", yr, ".csv"))
+cc <- read.csv(paste0("../data/pop_data_total_center_summarized_", yr, ".csv"))
+```
+
+```{r}
+s <- g %>%
+  st_as_sf(coords = c("tlon","tlat")) %>% st_set_crs(4326) %>% st_transform(6350)
+
+cc <- cc %>%
+  st_as_sf(coords = c("tlon", "tlat")) %>% st_set_crs(4326) %>% st_transform(6350)
+
+lso <- vector(mode = 'list', length = nrow(s))
+
+for (row in 1:nrow(s)){
+  cs <- data.frame(st_coordinates(cc)[1], st_coordinates(cc)[2]) %>%
+  rename(p_x = 1,
+         p_y = 2) %>%
+  mutate(seq = 1)
+  cs <- cbind(g[,c(1,4)],cs)
+  
+  ss <- s[row,] %>%
+    rowwise() %>%
+    mutate(p_x = unlist(geometry)[1],
+           p_y = unlist(geometry)[2]) %>%
+    mutate(seq = 2) %>%
+    st_drop_geometry() %>%
+    ungroup()
+  
+  ap <- rbind(ss,cs[row,]) %>%
+    arrange(variable, seq)
+  
+  m <- as.matrix(ap[order(ap$seq),
+                    c("p_x","p_y")])
+  
+  ls <- st_linestring(m) %>%
+    st_sfc() %>%
+    st_sf() %>%
+    mutate(variable = ap$variable[1],
+           pop = ap$pop[1]) %>%
+    bind_cols()
+  
+  lso <- lso %>% bind_rows(ls)
+}
+
+lsp <- lso %>% st_set_crs(6350)
+```
+
+```{r}
+s <- s %>% mutate(pop_pct = pop/sum(pop),
+                  log_pct = abs(log(pop_pct)),
+                  normalized_log_pct = 0.1 + (log_pct - max(log_pct)) / (min(log_pct) - max(log_pct)) * (0.7 - 0.1))
+
+plot(lsp["variable"])
+```
+
+# Plotting
+
+Finally, all we have to do is plot our points! While I don't have them sized relative to their populations, it would be very easy to do: all I'd have to do is replace the numeric value in `tm_symbols()` with the column name I wanted to graduate on.
+
+```{r graphics, width = 8, height = 5, units = "in", message=FALSE}
+ilh <- palette(c(rgb(114,153,67, maxColorValue = 255),
+                 rgb(148,79,161, maxColorValue = 255),
+                 rgb(76,196,144, maxColorValue = 255),
+                 rgb(185,74,115, maxColorValue = 255),
+                 rgb(193,158,60, maxColorValue = 255),
+                 rgb(104,123,210, maxColorValue = 255),
+                 rgb(185,85,61, maxColorValue = 255)))
+
+plot_fips <- unique(fips_codes$state_code)[1:51]
+plot_fips <- plot_fips[!plot_fips %in% c("02", "15", "72", "78")]
+
+us <- states(cb = TRUE, year = yr) %>% filter(if (yr == 2010) STATE %in% plot_fips else
+                                                 STATEFP %in% plot_fips) %>%
+  st_transform(6350) #weird artifact in tigris means that column names don't match
+
+t <- tm_shape(us, bbox = bb(us, ext = 1.1))+
+  tm_polygons(border.col = "#aaaaaa", lwd = 0.75, col = "#5b5b5b")+
+  tm_shape(lsp)+
+  tm_lines(col = "variable", palette = ilh, legend.col.show = FALSE, lwd = 1.5, legend.lwd.show = FALSE)+
+  tm_shape(s)+
+  tm_symbols(col = "variable", title.col = "Race/Ethnicity", size = "normalized_log_pct", border.col = "#bdbdbd", palette = ilh, border.lwd = 1, legend.col.show = FALSE, legend.size.show = FALSE)+
+  tm_shape(cc)+
+  tm_dots(col = "#1286c4", shape = 24, title = "Total center of population", size = 0.6, legend.show = FALSE, border.lwd = 1, border.col = "#bdbdbd")+
+  tm_add_legend(type = "symbol", 
+    labels = c("American/Alaskan Native", "Asian", "African-American", "Hawaiian/Pacific Islander", "Hispanic", "Other/Two or more", "White"),
+    col = ilh,
+    border.col = "#bdbdbd",
+    title = "Ethnicity",
+    size = 0.4)+
+  tm_add_legend(type = "symbol",
+                shape = 24,
+                col = "#1286c4",
+                size = 0.6,
+                border.col = "#bdbdbd",
+                labels = "Total center of population")+
+  tm_layout(main.title = "Center of population by race/ethnicity",
+            main.title.fontfamily = "Manrope",
+            main.title.fontface = 2,
+            main.title.size = 2,
+            bg.color = "#3b3b3b",
+            legend.outside = TRUE,
+            legend.text.color = "#bdbdbd", 
+            legend.text.fontfamily = "Manrope", 
+            legend.title.color = "#bdbdbd",
+            legend.title.fontface = 2,
+            legend.title.size = 1.5,
+            legend.title.fontfamily = "Manrope", 
+            legend.text.size = 0.75,
+            legend.position = c(0,0.25),
+            outer.bg.color = "#3b3b3b",
+            frame = FALSE,
+            main.title.color = "#bdbdbd")+
+  tm_credits(paste0("Decennial census data, ", yr, "\nGraphic by Harrison DeFord (@oonuttlet)"),
+             position = c(0,0.08),
+             col = "#bdbdbd",
+             fontfamily = "Open Sans",
+             size = 0.62)
+
+t
+
+if (!file.exists(paste0("../bin/center_of_pop_natl_",yr,"_intpt.png"))){
+  tmap_save(t, paste0("../bin/center_of_pop_natl_",yr,"_intpt.png"), dpi = 1200)
+}
+```

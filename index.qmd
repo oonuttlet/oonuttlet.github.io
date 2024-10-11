@@ -1,20 +1,36 @@
 ---
-title: ""
+title: "harrison deford"
 fig-cap-location: bottom
+listing:
+  categories: unnumbered
+  contents: 
+    - "posts/*/*.qmd"
+  type: default
+  sort: "title"
 ---
 
-![](files/harrison.png){width="40%"}
+forklift certified; aspiring geographer
+
+📍 baltimore
 
 # PORTFOLIO
 
-## [UMBC](https://ges.umbc.edu/)
+<!-- ## [UMBC](https://ges.umbc.edu/) -->
 
-::: {layout="[1,1]"}
-[![The Great Shrinking Lake](posts/381_proj/images/true_color.gif "The Great Shrinking Lake"){width="300px" fig-align="left"}](posts/381_proj)
+<!-- #### *Remote Sensing* -->
 
-[![Micromobility in Baltimore](posts/finalproj/images/3d_view_scooters.png "Micromobility in Baltimore"){width="300px" fig-align="left"}](posts/finalproj/)
-:::
+<!-- [The Great Shrinking Lake](posts/381_proj) -->
 
-------------------------------------------------------------------------
+<!-- #### *Transportation* -->
 
-## [Mapping Capital](https://mapping.capital)
+<!-- [Micromobility in Baltimore](posts/finalproj) -->
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- ## [Mapping Capital](https://mapping.capital) -->
+
+<!-- ------------------------------------------------------------------------ -->
+
+<!-- ## Personal Projects -->
+
+<!-- [Mean Centers of Population by Ethnicity](posts/center_of_pop/src) -->
