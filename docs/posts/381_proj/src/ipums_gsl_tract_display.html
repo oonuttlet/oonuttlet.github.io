@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Harrison DeFord">
+<meta name="dcterms.date" content="2022-11-18">
 
-<title>ipums_gsl_tract_display – harrison deford</title>
+<title>GSL data display – harrison deford</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,6 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../../">
+<link href="../../../files/rox_icon_512.png" rel="icon" type="image/png">
 <script src="../../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -147,7 +150,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">GSL data display</h1>
+</div>
 
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Harrison DeFord </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 18, 2022</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
 
 
 <div class="cell">
@@ -289,6 +320,7 @@ dbl (5): year, tpop, area, area_km, tpop_mn
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><img src="../images/utah_gsl_area.gif" class="img-fluid"></p>
+<p>One last time, this time creating a linear regression model:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>p8 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> vars_joined.label, <span class="fu">aes</span>(<span class="at">x =</span> tpop, <span class="at">y =</span> area_km))<span class="sc">+</span> </span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Water area of the Great Salt Lake compared with population, 1986-2021"</span>, <span class="at">x =</span> <span class="st">"Population of counties bordering the Great Salt Lake"</span>, <span class="at">y =</span> <span class="st">"Water area,"</span><span class="sc">~</span>km<span class="sc">^</span><span class="dv">2</span>)<span class="sc">+</span> </span>
@@ -306,7 +338,7 @@ dbl (5): year, tpop, area, area_km, tpop_mn
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="ipums_gsl_tract_display_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="3000"></p>
+<p><img src="ipums_gsl_tract_display_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="3300"></p>
 </figure>
 </div>
 </div>

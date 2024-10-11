@@ -154,7 +154,9 @@ p6 <- p5 +
 
 animate(p6, start_pause = 24, end_pause = 24, width = 8, height = 4, units = "in", dpi = 300)
 ```
+
 One last time, this time creating a linear regression model:
+
 ```{r fig.width = 11, fig.dpi = 300, fig.asp=.5}
 p8 <- ggplot(data = vars_joined.label, aes(x = tpop, y = area_km))+ 
   labs(title = "Water area of the Great Salt Lake compared with population, 1986-2021", x = "Population of counties bordering the Great Salt Lake", y = "Water area,"~km^2)+ 
@@ -191,5 +193,3 @@ linreg <- lm(area_km ~ tpop, data = vars_joined)
 
 summary(linreg)
 ```
-
-
