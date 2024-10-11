@@ -1,0 +1,153 @@
+---
+title: "Flow Mapping"
+author: "Harrison DeFord"
+date: '2022-05-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(geojsonsf)
+library(jsonlite)
+library(httr)
+library(sf)
+library(tibble)
+library(lubridate)
+library(tidycensus)
+library(tigris)
+library(stringr)
+library(dplyr)
+library(tmap)
+library(mapdeck)
+library(lwgeom)
+tmap_options(check.and.fix = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+options(tigris_use_cache = TRUE)
+```
+
+## Setup
+
+This script uses outputs from the previous 3 Rmd files to create a flow map based on the `mapdeck` package, and bins start and end points by hexes. This workflow is not currently automated for other datasets, but this is a minimal working example to show that it can be expanded to other metro areas. 
+
+```{r load_vars, message = FALSE}
+flow_lines <- readRDS("G:/My Drive/GES486/final_proj/results/flow_lines.RDS") %>%
+  st_transform(crs = 3857)
+baltimore_bound = counties(state = "MD", cb = TRUE) %>%
+  filter(str_detect(GEOID, "24510|24005")) %>%
+  st_transform(crs = 3857)
+```
+
+```{r generate_hex, warning=FALSE}
+balt_hex <- st_make_grid(baltimore_bound, #create 2000m hex grid
+                         cellsize = c(1600,1600),
+                         what = "polygons",
+                         square = FALSE,
+                         crs = 3857
+                         ) %>%
+  st_as_sf() %>%
+  mutate(hex_id = paste("hex_", row_number(), sep = ""))
+balt_hex.intersects <- st_intersects(st_union(baltimore_bound), balt_hex)
+balt_hex.subset <- balt_hex[balt_hex.intersects[[1]],]
+balt_centroid <- st_centroid(balt_hex.subset) %>% st_transform(4326) #dataframe of centroids of each hex
+baltimore_bound <- baltimore_bound %>% st_transform(4326)
+tm_shape(baltimore_bound)+
+  tm_polygons(col = "#bdbdbd", border.col = "black", lwd = 2)+
+  tm_shape(balt_hex)+
+  tm_borders()
+```
+
+This next block of code is a mess, but I couldn't get `dplyr` and `sf` to cooperate with some of these dataframes, which contained multiple geometry columns. This can be cleaned up (and probably will be), but for now, this works for the data that I have.
+
+```{r start_end_bin, message = FALSE}
+balt_hex <- balt_hex %>% st_transform(4326)
+balt_hex.subset <- balt_hex.subset %>% st_transform(4326)
+flow_lines_sf <- st_as_sf(flow_lines)
+flow_lines_sf <- st_transform(flow_lines_sf, crs = 4326)
+flow_lines_sf <- st_set_geometry(flow_lines_sf, flow_lines_sf$start_geom) %>% st_transform(4326)
+start_points_join <- st_join(flow_lines_sf, balt_hex.subset) #spatial join of start points (set start points as active geometry in previous step)
+flow_lines_sf <- st_set_geometry(flow_lines_sf, flow_lines_sf$end_geom) %>% st_transform(4326)
+end_points_join <- st_join(flow_lines_sf, balt_hex.subset) #in similar fashion, spatial join of end points
+flow_lines_sf$start_hex_id <- start_points_join$hex_id
+flow_lines_sf$end_hex_id <- end_points_join$hex_id
+flow_lines_sf <- left_join(st_drop_geometry(flow_lines_sf), balt_centroid, by = c("start_hex_id" = "hex_id")) #join centroid of endpoint hex to row
+flow_lines_sf <- rename(flow_lines_sf, start_centroid = x)
+flow_lines_sf <- left_join(flow_lines_sf, balt_centroid, by = c("end_hex_id" = "hex_id")) #likewise for end
+flow_lines_sf <- rename(flow_lines_sf, end_centroid = x)
+flow_lines_sf <- st_sf(flow_lines_sf) %>% st_transform(4326)
+flow_lines_arc <- rename(count(flow_lines_sf, start_hex_id, end_hex_id), wgt = n)
+flow_lines_arc <- flow_lines_arc %>% mutate(scale_weight = (3*wgt))
+flow_lines_arc <- left_join(st_drop_geometry(flow_lines_arc), balt_centroid, by = c("end_hex_id" = "hex_id"))
+flow_lines_arc <- left_join(flow_lines_arc, balt_centroid, by = c("start_hex_id" = "hex_id"))
+flow_lines_arc <- flow_lines_arc %>% rename(end_centroid = x.x, start_centroid = x.y) %>% st_sf()
+flow_lines_arc <- flow_lines_arc %>% st_transform(4326)
+```
+
+The following methodology, to count start and end points within hexes, is adapted from [Matt Herman's blog post](https://mattherman.info/blog/point-in-poly/) detailing the counting of trees within NYC census geographies.
+
+```{r count_endpoints, message = FALSE}
+start_hex_count <- count(as_tibble(start_points_join), hex_id) %>% rename(start_in_hex = n)
+end_hex_count <- count(as_tibble(end_points_join), hex_id) %>% rename(end_in_hex = n)
+balt_hex.subset <- left_join(balt_hex.subset, start_hex_count, by = c("hex_id" = "hex_id"))
+balt_hex.subset <- left_join(balt_hex.subset, end_hex_count, by = c("hex_id" = "hex_id"))
+balt_hex.subset <- balt_hex.subset %>% replace(is.na(.), 0)
+balt_hex.subset <- balt_hex.subset %>% mutate(total_endpoint = start_in_hex + end_in_hex) 
+balt_hex.subset <- balt_hex.subset %>% st_transform(4326)
+```
+
+Three flow maps can be generated from this data: one symbolized with start points per hex, one with end points per hex, and one with total endpoints per hex.
+
+```{r start_point_map}
+flow_lines_arc %>%
+  mapdeck(token = Sys.getenv("MAPBOX_TOKEN")) %>%
+  add_arc(origin = "start_centroid",
+          destination = "end_centroid",
+          stroke_from = "#000000",
+          stroke_to = "#000000",
+          stroke_width = "scale_weight",
+          update_view = TRUE) %>%
+  add_sf(data = balt_hex.subset,
+         fill_colour = "start_in_hex",
+         fill_opacity = 180,
+         legend = TRUE
+         )
+```
+
+```{r end_point_map}
+flow_lines_arc %>%
+  mapdeck(token = Sys.getenv("MAPBOX_TOKEN")) %>%
+  add_arc(origin = "start_centroid",
+          destination = "end_centroid",
+          stroke_from = "#000000",
+          stroke_to = "#000000",
+          stroke_width = "scale_weight",
+          update_view = TRUE) %>%
+  add_sf(data = balt_hex.subset,
+         fill_colour = "end_in_hex",
+         fill_opacity = 180,
+         legend = TRUE
+         )
+```
+
+```{r total_point_map}
+flow_lines_arc %>%
+  mapdeck(token = Sys.getenv("MAPBOX_TOKEN")) %>%
+  add_arc(origin = "start_centroid",
+          destination = "end_centroid",
+          stroke_from = "#000000",
+          stroke_to = "#000000",
+          stroke_width = "scale_weight",
+          update_view = TRUE) %>%
+  add_sf(data = balt_hex.subset,
+         fill_colour = "total_endpoint",
+         fill_opacity = 180,
+         legend = TRUE
+         )
+```
+
+```{r}
+if(!file.exists("../results/flow_lines_arc.RDS")){
+  saveRDS(flow_lines_arc, file = "../results/flow_lines_arc.RDS")
+}
+if(!file.exists("../results/balt_hex.RDS")){
+  saveRDS(balt_hex, file = "../results/balt_hex.RDS")
+}
+```

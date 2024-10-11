@@ -1,0 +1,161 @@
+---
+title: "Micromobility in Baltimore"
+author: "Harrison DeFord"
+date: '2022-05-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(geojsonsf)
+library(jsonlite)
+library(httr)
+library(sf)
+library(tibble)
+library(lubridate)
+library(tidycensus)
+library(tigris)
+library(stringr)
+library(dplyr)
+library(tmap)
+library(mapdeck)
+library(lwgeom)
+library(areal)
+library(lehdr)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
+library(knitr)
+tmap_options(check.and.fix = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+options(tigris_use_cache = TRUE)
+options(scipen = 999)
+```
+
+```{r load_vars, results = 'hide'}
+flow_lines_arc <- st_sf(readRDS("../results/flow_lines_arc.RDS"))
+balt_hex <- st_sf(readRDS("../results/balt_hex.RDS"))
+otm_lehd <- st_read("../results/otm_5b749ca22bf64d9abe899ef50a619131/points_2019.shp") %>% st_transform(3857) %>%
+  select(id, c000, geometry)
+scooters_raw <- st_read("../results/scooters_raw.gpkg") %>% filter(is_disabled == 0)
+```
+
+```{r census_var, results = 'hide'}
+baltimore_bg_income <- get_acs(geography = "block group", 
+                           variables = c("pop" = "B03002_001", # Total
+                                         "pop_nhwhite" = "B03002_003", # NH White
+                                         "pop_nhblack" = "B03002_004", # NH Black
+                                         "pop_nhamind" = "B03002_005", # NH Am Ind
+                                         "pop_nhasian" = "B03002_006", # NH Asian
+                                         "pop_nhhwnpi" = "B03002_007", # NH Hawaiin/PI
+                                         "pop_nhother" = "B03002_008", # One Other
+                                         "pop_nhtwomr" = "B03002_009", # Two+
+                                         "pop_hispltx" = "B03002_012", # Hispanic/Latinx
+                                         "hu_total"  = "B25001_001", # Housing Units
+                                         "hu_totocc" = "B25003_001", # Housing Units - Occ
+                                         "hu_totown" = "B25003_002", # Housing Units - Owner Occ,
+                                         "hu_totrnt" = "B25003_003", # Housing Units - Renter Occ,
+                                         "mhhi" = "B19013_001"), #median household income
+                           
+                           year = 2019,
+                           survey = "acs5",
+                           state = c(24), 
+                           county = c(510), 
+                           geometry = TRUE, 
+                           output = "wide") %>% st_transform(3857)
+```
+
+```{r raceetch, results = 'hide'}
+# Computes the NH Asian Population
+baltimore_bg_income$pop_nhasianXE <- baltimore_bg_income$pop_nhasianE + baltimore_bg_income$pop_nhhwnpiE
+
+# Computes the NH "Other" Population
+baltimore_bg_income$pop_nhotherXE <- baltimore_bg_income$pop_nhamindE + baltimore_bg_income$pop_nhotherE + baltimore_bg_income$pop_nhtwomrE
+```
+
+```{r st_erase, results = 'hide'}
+st_erase <- function(x, y) {
+  st_difference(x, st_make_valid(st_union(y)))}
+bmore_water <- area_water("MD", c(510,005), class = "sf") %>% st_transform(3857) %>% filter(AWATER > 20000)
+bmore_water <- st_make_valid(st_buffer(bmore_water, 0)) # Fix topology
+```
+
+```{r hexbin, results = 'hide'}
+baltimore_bg_income <- baltimore_bg_income %>% st_transform(3857)
+baltimore_bg_income <- st_erase(baltimore_bg_income, bmore_water)
+balt_hex <- balt_hex %>% st_transform(3857)
+balt_bg_emp <- st_join(otm_lehd, balt_hex)
+balt_bg_emp <- balt_bg_emp %>% group_by(hex_id) %>% summarise(sum_c000 = sum(c000))
+balt_hex.intersects <- st_intersects(st_union(baltimore_bg_income), balt_hex)
+balt_hex.subset <- balt_hex[balt_hex.intersects[[1]],]
+bmore_scooters_in_hex <- st_join(balt_hex.subset, scooters_raw)
+bmore_scooter_hex_count <- count(as_tibble(bmore_scooters_in_hex), hex_id)
+balt_hex.subset <- left_join(balt_hex.subset, bmore_scooter_hex_count)
+```
+
+```{r areal, results = 'hide'}
+ar_validate(source = baltimore_bg_income, target = balt_hex.subset, varList = "popE", method = "aw", verbose = TRUE)
+
+bmore_grid_income <- aw_interpolate(balt_hex.subset, tid = hex_id, source = baltimore_bg_income, sid = "GEOID", weight = "sum", output = "sf", extensive = c("popE","hu_totalE", "pop_nhwhiteE"))
+bmore_grid_emp_income <- left_join(bmore_grid_income, st_drop_geometry(balt_bg_emp))
+bmore_grid_emp_income[is.na(bmore_grid_emp_income)] <- 0
+bmore_grid_emp_income <- bmore_grid_emp_income %>% rename(scooter_count = n)%>% mutate(people_pt = popE + sum_c000, scooters_per_pt = (1000*scooter_count/18)/people_pt, pct_bipoc = (popE-pop_nhwhiteE)/popE) %>% filter(people_pt > 10)
+bmore_grid_emp_income[is.na(bmore_grid_emp_income)] <- 0
+bmore_grid_emp_income <- bmore_grid_emp_income %>% st_transform(3857)
+```
+
+```{r bbox, results = 'hide'}
+bbox_new <- st_bbox(bmore_grid_emp_income) # current bounding box
+
+xrange <- bbox_new$xmax - bbox_new$xmin # range of x values
+yrange <- bbox_new$ymax - bbox_new$ymin # range of y values
+
+bbox_new <- bbox_new %>%  # take the bounding box ...
+  st_as_sfc() # ... and make it a sf polygon
+```
+
+```{r plots, results = 'hide'}
+ggplot.pts <- ggplot()+
+  geom_sf(balt_hex, fill = NA, mapping = aes())+
+  geom_sf(bmore_grid_emp_income, color = NA, mapping = aes(fill = people_pt))+
+  labs(title = "Total person-points", fill = "Person-points")+
+  geom_sf(st_union(baltimore_bg_income), fill = NA, color = "black", size = 0.8, mapping = aes())+
+  scale_fill_viridis_c(breaks = c(0, 20000, 40000))+
+  coord_sf(xlim = st_coordinates(bbox_new)[c(1,2),1], 
+           ylim = st_coordinates(bbox_new)[c(2,3),2]) + 
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5), panel.border = element_rect(color = "black", fill = NA), legend.position = "bottom", plot.margin = margin(0,5,0,5))
+
+ggplot.pct_bipoc <- ggplot()+
+  geom_sf(balt_hex, fill = NA, mapping = aes())+
+  geom_sf(bmore_grid_emp_income, color = NA, mapping = aes(fill = pct_bipoc))+
+  labs(title = "Percentage of BIPOC residents", fill = "% BIPOC")+
+  geom_sf(st_union(baltimore_bg_income), fill = NA, color = "black", size = 0.8, mapping = aes())+
+  scale_fill_viridis_c()+
+  coord_sf(xlim = st_coordinates(bbox_new)[c(1,2),1], 
+           ylim = st_coordinates(bbox_new)[c(2,3),2]) + 
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5), panel.border = element_rect(color = "black", fill = NA), legend.position = "bottom", plot.margin = margin(0,5,0,5))
+
+ggplot.scooters_pt <- ggplot()+
+  geom_sf(balt_hex, fill = NA, mapping = aes())+
+  geom_sf(bmore_grid_emp_income, color = NA, mapping = aes(fill = scooters_per_pt))+
+  labs(title = "Scooters per 1000 person-points", fill = "Scooters per 1000 \nperson-points")+
+  geom_sf(st_union(baltimore_bg_income), fill = NA, color = "black", size = 0.8, mapping = aes())+
+  scale_fill_viridis_c()+
+  coord_sf(xlim = st_coordinates(bbox_new)[c(1,2),1], 
+           ylim = st_coordinates(bbox_new)[c(2,3),2]) + 
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5), panel.border = element_rect(color = "black", fill = NA), legend.position = "bottom", plot.margin = margin(0,5,0,5))
+```
+
+```{r lay1, results = 'hide', fig.align='center'}
+layout1 <- ggplot.scooters_pt|ggplot.pct_bipoc
+layout1
+```
+
+```{r lay2, results = 'hide', fig.align = "center"}
+layout2 <- ggplot.scooters_pt | ggplot.pts
+layout2
+```
+
+

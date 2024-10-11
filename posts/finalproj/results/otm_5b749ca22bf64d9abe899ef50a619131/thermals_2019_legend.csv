@@ -1,0 +1,6 @@
+ColorId,RGB,MinJobDensity,MaxJobDensity,Units
+1,"204,204,238",5.0,4396.0,Jobs per square mile
+2,"153,153,221",4397.0,17571.0,Jobs per square mile
+3,"102,102,204",17572.0,39530.0,Jobs per square mile
+4,"51,51,187",39531.0,70272.0,Jobs per square mile
+5,"0,0,170",70273.0,109798.0,Jobs per square mile

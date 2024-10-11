@@ -1,1 +1,57 @@
 /* css styles */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+a {
+ color:#FA8072;
+}
+
+a:hover,
+a:focus {
+ color:#FFA07A;
+}
+a small {
+ color:#FF7F50;
+}
+a:hover small {
+ color:#FFA07A
+}
+
+/* body means everything, the default for the page */
+body {
+ font-family:"Manrope", "Helvetica Neue", Helvetica, Arial, sans-serif;
+ font-size: 105%;
+}
+
+/* these are the headers */
+h2, h3, h4, h5, h6 {
+ letter-spacing: -0.08em;
+ font-family:'Open Sans', 'Arial Narrow', Arial, sans-serif;
+}
+
+h1 {
+  color: #a95c45;
+  font-family:'Open Sans', 'Arial Narrow', Arial, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+header h1 a {
+ font-size: 1.2em;
+ letter-spacing: -0.08em;
+ color: #FF7F50;
+}
+
+header h1 a:hover {
+ font-size: 1.2em;
+ color: #FFA07A;
+}
+
+header h2 a {
+ font-size: 1.2em;
+ color: #2165ac;
+}
+
+header h2 a:hover {
+ font-size: 1.2em;
+ color: #92c6de;
+}

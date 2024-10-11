@@ -1,12 +1,13 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  title: "oonuttlet.github.io"
+  title: "harrison deford"
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: home
       - about.qmd
 
 format:

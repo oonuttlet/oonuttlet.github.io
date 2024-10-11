@@ -1,0 +1,99 @@
+---
+title: "Data Gathering and Wrangling"
+author: "Harrison DeFord"
+date: '2022-05-05'
+output: html_document
+---
+
+## Setup
+
+The purpose of this script is to define functions which convert data collected by the python script running on mapping.capital, which are returned as nested JSON files, to geoJSON which can be used for analysis. This file is set up for a dataset of all scooter locations, collected every 15 minutes, from 0600 Eastern to 1000 Eastern on May 1, 2022. The second function defined in this document creates a long dataframe which is a timeseries of scooter locations over time.
+
+```{r setup, include=FALSE}
+library(geojsonsf)
+library(jsonlite)
+library(httr)
+library(sf)
+library(tibble)
+library(lubridate)
+library(tidycensus)
+library(tigris)
+library(stringr)
+library(dplyr)
+library(tmap)
+tmap_options(check.and.fix = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
+options(tigris_use_cache = TRUE)
+```
+
+```{r vendors, message = FALSE}
+vendors = list("link","lime","spin")
+```
+
+This code block defines a method to convert the nested JSON returned by scooter vendors to a non-nested geoJSON which can be read by `sf`.
+
+```{r define_json, message = FALSE}
+json2geoJSON <- function(vendor){
+  files <- list.files(path = paste("../data/monday/", vendor, "/morning/json/", sep = ""), pattern="*.json", full.names=TRUE, recursive=FALSE) #list files in directory
+    lapply(files, function(x) {
+      current_data <- fromJSON(txt = x) # load file
+      current_tibble <- as_tibble(current_data$data$bikes) #convert to tibble
+      current_tibble$timestamp_utc <- as_datetime(current_data$last_updated, tz = Sys.timezone()) #create timestamp column
+      current_sf <- st_as_sf(current_tibble, coords = c("lon","lat"), crs = 4326) #coerce to sf
+      if (!file.exists(paste("../data/monday/", vendor, "/morning/geoJSON/",
+                                       current_data$last_updated, "_", vendor, ".geoJSON"))){
+      st_write(current_sf, dsn = paste("../data/monday/", vendor, "/morning/geoJSON/",
+                                       current_data$last_updated, "_", vendor, ".geoJSON", sep = "")
+               , append = FALSE) #write as geoJSON
+      }
+})
+}
+```
+
+```{r iterate_json, message = FALSE, warning=FALSE,results=FALSE}
+for (v in vendors){
+  json2geoJSON(v)
+} #loop through each of link, lime, spin
+```
+
+This section of code defines a function which creates a timeseries for each scooter and adds a vendor column which can be grouped by in following scripts.
+
+Note 2024-10-11: I cannot emphasize enough how much you *SHOULD NOT USE GLOBAL ASSIGNMENT* (`<<-`) in a function. This was some of the first R code I'd ever written, and I'm leaving it for posterity. However, there are MUCH better ways to do this.
+
+```{r define_ts, message = FALSE}
+load_timeseries <- function(vendor){
+  files <- list.files(path = paste("../data/monday/", vendor, "/morning/geoJSON/", sep = ""), pattern="*.geoJSON", full.names=TRUE, recursive=FALSE) #load files from geoJSON directory
+  list_df <<- vector(mode = "list") #empty list
+  for(fn in files){
+    tmp <- st_read(fn) #read each file in geoJSON dir
+    list_df[[which(fn == files)]] <<- tmp #append to list_df
+  }
+  test_sf <<- bind_rows(list_df) #make long df
+  test_sf$vendor <<- vendor #create vendor column
+  test_sf <<- distinct(test_sf) #script adds multiples, need to debug. hacky solution here
+}
+```
+
+```{r iterate_link, message = FALSE, results=FALSE}
+load_timeseries("link")
+link_data <- test_sf
+if (!file.exists("../results/link_mon_am.gpkg")){
+  st_write(link_data, dsn = paste0("../results/link_mon_am.gpkg", sep = ""), append = FALSE)
+}
+```
+
+```{r iterate_lime, message = FALSE, results = FALSE}
+load_timeseries("lime")
+lime_data <- test_sf
+if (!file.exists("../results/lime_mon_am.gpkg")){
+  st_write(lime_data, dsn = paste0("../results/lime_mon_am.gpkg", sep = ""), append = FALSE)
+}
+```
+
+```{r iterate_spin, message = FALSE, results = FALSE}
+load_timeseries("spin")
+spin_data <- test_sf
+if (!file.exists("../results/spin_mon_am.gpkg")){
+  st_write(spin_data, dsn = paste0("../results/spin_mon_am.gpkg", sep = ""), append = FALSE)
+}
+```
