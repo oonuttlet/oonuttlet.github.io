@@ -3,6 +3,8 @@ title: "Flow Mapping"
 author: "Harrison DeFord"
 date: '2022-05-05'
 output: html_document
+execute: 
+  eval: false
 ---
 
 ```{r setup, include=FALSE}
@@ -26,7 +28,7 @@ options(tigris_use_cache = TRUE)
 
 ## Setup
 
-This script uses outputs from the previous 3 Rmd files to create a flow map based on the `mapdeck` package, and bins start and end points by hexes. This workflow is not currently automated for other datasets, but this is a minimal working example to show that it can be expanded to other metro areas. 
+This script uses outputs from the previous 3 Rmd files to create a flow map based on the `mapdeck` package, and bins start and end points by hexes. This workflow is not currently automated for other datasets, but this is a minimal working example to show that it can be expanded to other metro areas.
 
 ```{r load_vars, message = FALSE}
 flow_lines <- readRDS("G:/My Drive/GES486/final_proj/results/flow_lines.RDS") %>%

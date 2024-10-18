@@ -191,81 +191,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>This script relies on 3 geopackage outputs from the previous script. It creates a long dataframe, inclusive of all three vendors, groups them by permanent, unique bike ID, and defines a trip as a movement of 50 meters between timestamps, in an attempt to adjust for GPS variability.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>link_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/link_mon_am.gpkg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `link_mon_am' from data source 
-  `D:\website\oonuttlet.github.io\posts\finalproj\results\link_mon_am.gpkg' 
-  using driver `GPKG'
-Simple feature collection with 71931 features and 7 fields
-Geometry type: POINT
-Dimension:     XY
-Bounding box:  xmin: -79.7663 ymin: 33.87113 xmax: -75.11482 ymax: 40.16036
-Geodetic CRS:  WGS 84</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>lime_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/spin_mon_am.gpkg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `spin_mon_am' from data source 
-  `D:\website\oonuttlet.github.io\posts\finalproj\results\spin_mon_am.gpkg' 
-  using driver `GPKG'
-Simple feature collection with 16584 features and 6 fields
-Geometry type: POINT
-Dimension:     XY
-Bounding box:  xmin: -76.71196 ymin: 39.22984 xmax: -76.53002 ymax: 39.37177
-Geodetic CRS:  WGS 84</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spin_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/spin_mon_am.gpkg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `spin_mon_am' from data source 
-  `D:\website\oonuttlet.github.io\posts\finalproj\results\spin_mon_am.gpkg' 
-  using driver `GPKG'
-Simple feature collection with 16584 features and 6 fields
-Geometry type: POINT
-Dimension:     XY
-Bounding box:  xmin: -76.71196 ymin: 39.22984 xmax: -76.53002 ymax: 39.37177
-Geodetic CRS:  WGS 84</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>scooters_raw <span class="ot">=</span> <span class="fu">bind_rows</span>(link_data, lime_data, spin_data) <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3857</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/scooters_raw.gpkg"</span>)){</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_write</span>(scooters_raw, <span class="at">dsn =</span> <span class="st">"../results/scooters_raw.gpkg"</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>link_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/link_mon_am.gpkg"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>lime_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/spin_mon_am.gpkg"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>spin_data <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/spin_mon_am.gpkg"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>scooters_raw <span class="ot">=</span> <span class="fu">bind_rows</span>(link_data, lime_data, spin_data) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3857</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/scooters_raw.gpkg"</span>)){</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_write</span>(scooters_raw, <span class="at">dsn =</span> <span class="st">"../results/scooters_raw.gpkg"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>First, we’ll filter out the disabled bike observations, and split the bikes into their own lists in order to apply a function over each bike.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>scooters_split <span class="ot">&lt;-</span> scooters_raw <span class="sc">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(is_disabled <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(vendor, bike_id) <span class="sc">%&gt;%</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>scooters_split <span class="ot">&lt;-</span> scooters_raw <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(is_disabled <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(vendor, bike_id) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This function defines what constitutes a trip. It is <em>slow</em>. When it’s done, each list element, representing a scooter, will have a field delineating if a given time-interval was part of a trip.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>scooters_trip <span class="ot">&lt;-</span> <span class="fu">lapply</span>(scooters_split, <span class="cf">function</span>(df){</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dist_prev =</span> units<span class="sc">::</span><span class="fu">drop_units</span>(<span class="fu">st_distance</span>(geom, <span class="fu">lag</span>(geom), <span class="at">by_element =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">dist_next =</span> units<span class="sc">::</span><span class="fu">drop_units</span>(<span class="fu">st_distance</span>(geom, <span class="fu">lead</span>(geom), <span class="at">by_element =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">time_id =</span> <span class="fu">row_number</span>(), <span class="co">#this is what allows us to order points for QGIS analysis</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">movement_id =</span> <span class="fu">paste</span>(bike_id, <span class="st">"_"</span>, <span class="fu">row_number</span>(), <span class="at">sep =</span> <span class="st">""</span>), <span class="co">#perhaps redundant, but easy solution for moving between R and QGIS</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">trip =</span> <span class="fu">case_when</span>(</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                  dist_prev <span class="sc">&gt;</span> <span class="dv">50</span> <span class="sc">|</span> dist_next <span class="sc">&gt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="co">#define trip based on distance column</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scooters_trip <span class="ot">&lt;-</span> <span class="fu">lapply</span>(scooters_split, <span class="cf">function</span>(df){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dist_prev =</span> units<span class="sc">::</span><span class="fu">drop_units</span>(<span class="fu">st_distance</span>(geom, <span class="fu">lag</span>(geom), <span class="at">by_element =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">dist_next =</span> units<span class="sc">::</span><span class="fu">drop_units</span>(<span class="fu">st_distance</span>(geom, <span class="fu">lead</span>(geom), <span class="at">by_element =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">time_id =</span> <span class="fu">row_number</span>(), <span class="co">#this is what allows us to order points for QGIS analysis</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">movement_id =</span> <span class="fu">paste</span>(bike_id, <span class="st">"_"</span>, <span class="fu">row_number</span>(), <span class="at">sep =</span> <span class="st">""</span>), <span class="co">#perhaps redundant, but easy solution for moving between R and QGIS</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">trip =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                  dist_prev <span class="sc">&gt;</span> <span class="dv">50</span> <span class="sc">|</span> dist_next <span class="sc">&gt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="dv">1</span>, <span class="co">#define trip based on distance column</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>                  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>))</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that this is some of the earliest R code I’d ever written. I’m leaving it alone for posterity’s sake, but I’m not sure why I split it into groups and re-bound it again.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trip_long <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(scooters_trip) <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trip <span class="sc">==</span> <span class="dv">1</span>) <span class="co">#filter by only trip points</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>trip_split <span class="ot">&lt;-</span> trip_long <span class="sc">%&gt;%</span> <span class="co">#split again by trips</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bike_id) <span class="sc">%&gt;%</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>trip_long <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(scooters_trip) <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(trip <span class="sc">==</span> <span class="dv">1</span>) <span class="co">#filter by only trip points</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>trip_split <span class="ot">&lt;-</span> trip_long <span class="sc">%&gt;%</span> <span class="co">#split again by trips</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bike_id) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#trip_split_id &lt;- lapply(trip_split, function(df){</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  df %&gt;% mutate(time_id = row_number())</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#})</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>trip_id_long <span class="ot">&lt;-</span><span class="fu">bind_rows</span>(trip_split) <span class="co">#bind into trips</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/trip_id_long.gpkg"</span>)){</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_write</span>(trip_id_long, <span class="st">"../results/trip_id_long.gpkg"</span>, <span class="at">append =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#trip_split_id &lt;- lapply(trip_split, function(df){</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  df %&gt;% mutate(time_id = row_number())</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#})</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>trip_id_long <span class="ot">&lt;-</span><span class="fu">bind_rows</span>(trip_split) <span class="co">#bind into trips</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/trip_id_long.gpkg"</span>)){</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_write</span>(trip_id_long, <span class="st">"../results/trip_id_long.gpkg"</span>, <span class="at">append =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

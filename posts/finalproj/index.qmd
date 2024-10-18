@@ -4,6 +4,8 @@ categories:
         - "umbc"
         - "transportation"
 image: "images/3d_view_scooters.png"
+execute: 
+  eval: false
 ---
 
 # Equitable Access to Dockless Vehicles in Baltimore City

@@ -191,53 +191,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>This script is meant to be run after QGIS 2.x.x is used to generate paths from the timeseries data generated in the previous script. The older version of QGIS is necessary to use the Points to Paths plugin, which allows for separate lines per vertex (important because we define each 15-minute interval as a distinct trip, even if movement was detected over several consecutive intervals). Within the plugin, bike IDs and row numbers were concatenated using field calculator in order to create a movement ID, which was used to define a trip as a movement of over 50 meters within 15 minutes to account for GPS variability on scooters.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flow_lines <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/trip_id_p2p.shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `trip_id_p2p' from data source 
-  `D:\website\oonuttlet.github.io\posts\finalproj\results\trip_id_p2p.shp' 
-  using driver `ESRI Shapefile'
-Simple feature collection with 255 features and 7 fields
-Geometry type: LINESTRING
-Dimension:     XY
-Bounding box:  xmin: -8538362 ymin: 4755023 xmax: -8520945 ymax: 4774157
-Projected CRS: WGS 84 / Pseudo-Mercator</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>trip_id_long <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/trip_id_long.gpkg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `trip_id_long' from data source 
-  `D:\website\oonuttlet.github.io\posts\finalproj\results\trip_id_long.gpkg' 
-  using driver `GPKG'
-Simple feature collection with 10251 features and 13 fields
-Geometry type: POINT
-Dimension:     XY
-Bounding box:  xmin: -8539536 ymin: 4754428 xmax: -8516307 ymax: 4775070
-Projected CRS: WGS 84 / Pseudo-Mercator</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>flow_lines_proj <span class="ot">&lt;-</span> flow_lines <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">4326</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flow_lines <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/trip_id_p2p.shp"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>trip_id_long <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"../results/trip_id_long.gpkg"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>flow_lines_proj <span class="ot">&lt;-</span> flow_lines <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">4326</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We use <code>lwgeom</code> to define the start and endpoints of each of our flow lines, so we have a directionality for our trips</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>flow_lines<span class="sc">$</span>start_geom <span class="ot">&lt;-</span> <span class="fu">st_startpoint</span>(flow_lines)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>flow_lines<span class="sc">$</span>end_geom <span class="ot">&lt;-</span> <span class="fu">st_endpoint</span>(flow_lines)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>flow_lines_proj<span class="sc">$</span>start_geom <span class="ot">&lt;-</span> <span class="fu">st_startpoint</span>(flow_lines_proj)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>flow_lines_proj<span class="sc">$</span>end_geom <span class="ot">&lt;-</span> <span class="fu">st_endpoint</span>(flow_lines_proj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>flow_lines<span class="sc">$</span>start_geom <span class="ot">&lt;-</span> <span class="fu">st_startpoint</span>(flow_lines)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>flow_lines<span class="sc">$</span>end_geom <span class="ot">&lt;-</span> <span class="fu">st_endpoint</span>(flow_lines)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>flow_lines_proj<span class="sc">$</span>start_geom <span class="ot">&lt;-</span> <span class="fu">st_startpoint</span>(flow_lines_proj)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>flow_lines_proj<span class="sc">$</span>end_geom <span class="ot">&lt;-</span> <span class="fu">st_endpoint</span>(flow_lines_proj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Since almost all spatial file formats require only one geometry column, we write to an RDS file to preserve our geometries (for starts and ends, and in the next script for hexagon data as well).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>flow_lines <span class="ot">&lt;-</span> flow_lines <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">st_length</span>(geometry))</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(flow_lines, <span class="at">mean =</span> <span class="fu">mean</span>(dist))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 1 feature and 1 field
-Geometry type: MULTILINESTRING
-Dimension:     XY
-Bounding box:  xmin: -8538362 ymin: 4755023 xmax: -8520945 ymax: 4774157
-Projected CRS: WGS 84 / Pseudo-Mercator
-          mean                       geometry
-1 1289.586 [m] MULTILINESTRING ((-8523392 ...</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/flow_lines.RDS"</span>)){</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(<span class="at">object =</span> flow_lines, <span class="at">file =</span> <span class="st">"../results/flow_lines.RDS"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>flow_lines <span class="ot">&lt;-</span> flow_lines <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">dist =</span> <span class="fu">st_length</span>(geometry))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summarise</span>(flow_lines, <span class="at">mean =</span> <span class="fu">mean</span>(dist))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"../results/flow_lines.RDS"</span>)){</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(<span class="at">object =</span> flow_lines, <span class="at">file =</span> <span class="st">"../results/flow_lines.RDS"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

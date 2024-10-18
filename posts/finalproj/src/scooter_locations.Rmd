@@ -3,6 +3,8 @@ title: "Micromobility in Baltimore"
 author: "Harrison DeFord"
 date: '2022-05-05'
 output: html_document
+execute: 
+  eval: false
 ---
 
 ```{r setup, include=FALSE}
@@ -157,5 +159,3 @@ layout1
 layout2 <- ggplot.scooters_pt | ggplot.pts
 layout2
 ```
-
-

@@ -3,22 +3,24 @@ title: "Centers of Population by Race/Ethnicity"
 author: "Harrison DeFord (hdeford1 at umbc dot edu)"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: html_document
+execute:
+  eval: false
 ---
 
 Every decennial census, the U.S. Census Bureau releases an updated version of the [Mean Center of Population](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.html), which can be interpreted as the "center of gravity" of the U.S. population. The goal of this project is to calculate the mean center of population *per ethnic group* captured in the decennial census.
 
 For simplification, the groups of interest in this analysis are:
 
-| Group |Census Sub-groups |
-|--|---|
-|Hispanic|"Hispanic or Latino"|
-|NH White|"Not Hispanic or Latino; White alone"|
-|NH African-American|"Not Hispanic or Latino; Black or African-American alone"|
-|NH American and Alaskan Native|"Not Hispanic or Latino; American Indian and Alaska Native alone"|
-|NH Asian|"Not Hispanic or Latino; Asian alone"|
-|NH Hawaiian and Pacific Islander|"Not Hispanic or Latino; Native Hawaiian and Other Pacific Islander alone"|
-|NH Other|"Not Hispanic or Latino; Some Other Race alone"|
-|NH Two or more|"Not Hispanic or Latino; Two or more races"|
+| Group | Census Sub-groups |
+|-----------------------------|-------------------------------------------|
+| Hispanic | "Hispanic or Latino" |
+| NH White | "Not Hispanic or Latino; White alone" |
+| NH African-American | "Not Hispanic or Latino; Black or African-American alone" |
+| NH American and Alaskan Native | "Not Hispanic or Latino; American Indian and Alaska Native alone" |
+| NH Asian | "Not Hispanic or Latino; Asian alone" |
+| NH Hawaiian and Pacific Islander | "Not Hispanic or Latino; Native Hawaiian and Other Pacific Islander alone" |
+| NH Other | "Not Hispanic or Latino; Some Other Race alone" |
+| NH Two or more | "Not Hispanic or Latino; Two or more races" |
 
 : {.striped .hover}
 
@@ -42,7 +44,7 @@ options(scipen = 999)
 extrafont::loadfonts(device = "win", quiet = T)
 
 rm(list = ls())
-yr = 2020
+yr = 2010
 ```
 
 # Parallelization

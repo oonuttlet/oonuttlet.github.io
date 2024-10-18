@@ -3,6 +3,8 @@ title: "Data Gathering and Wrangling"
 author: "Harrison DeFord"
 date: '2022-05-05'
 output: html_document
+execute: 
+  eval: false
 ---
 
 ## Setup
@@ -58,10 +60,8 @@ for (v in vendors){
 
 This section of code defines a function which creates a timeseries for each scooter and adds a vendor column which can be grouped by in following scripts.
 
-::: {.callout-important}
-
+::: callout-important
 Note 2024-10-11: I cannot emphasize enough how much you *SHOULD NOT USE GLOBAL ASSIGNMENT* (`<<-`) in a function. This was some of the first R code I'd ever written, and I'm leaving it for posterity. However, there are MUCH better ways to do this.
-
 :::
 
 ```{r define_ts, message = FALSE}
