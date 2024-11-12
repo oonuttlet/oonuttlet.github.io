@@ -1,6 +1,9 @@
 ---
 title: Quantifying the local impact of wildfire on demographic factors 
 bibliography: references.bib
+categories: 
+        - "umbc"
+        - "human geography"
 ---
 
 ## Introduction
