@@ -66,7 +66,7 @@ options(tigris_use_cache = T)
 
 ```{r, message=FALSE}
 # Example of tigris:
-nm <- tigris::states() |>
+nm <- tigris::states(progress_bar = F) |>
   dplyr::filter(STUSPS == "NM") |>
   st_as_sfc()
 # Example of arcgislayers:
