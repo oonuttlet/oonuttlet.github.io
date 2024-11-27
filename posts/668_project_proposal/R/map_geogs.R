@@ -2,7 +2,8 @@ map_counties.default <- function(bbox, decade) {
   counties(
     resolution = "20m",
     year = decade,
-    filter_by = st_bbox(bbox)
+    filter_by = st_bbox(bbox),
+    progress_bar = F
   ) |>
     select(-c(STATEFP, COUNTYFP)) |>
     (\(df) {
@@ -26,7 +27,8 @@ map_tracts.default <- function(s, c, y) {
   tracts(
     state = s,
     county = c,
-    year = y
+    year = y,
+    progress_bar = F
   ) |>
     select(-c(STATEFP, COUNTYFP)) |>
     (\(df) {
