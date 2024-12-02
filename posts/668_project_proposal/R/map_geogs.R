@@ -1,10 +1,25 @@
-map_counties.default <- function(bbox, decade) {
-  counties(
+# function wrapped by `get_counties_all_years()`
+# handles different vintages (and different column names) by default
+map_counties <- function(data, decade) {
+  ct <- counties(
     resolution = "20m",
     year = decade,
-    filter_by = st_bbox(bbox),
-    progress_bar = F
-  ) |>
+    filter_by = st_bbox(data)
+  )
+
+  if (decade == 2000){
+    ct_std <- ct |>
+      mutate(
+        decade = decade,
+        GEOID = paste0(STATEFP, COUNTYFP)
+      ) |>
+      distinct(STATEFP, COUNTYFP, decade, .keep_all = TRUE) |>
+      select(GEOID, STATEFP, COUNTYFP, decade, geometry) |>
+      st_as_sf()
+    return(ct_std)
+  }
+
+  ct_std <- ct |>
     select(-c(STATEFP, COUNTYFP)) |>
     (\(df) {
       names(df) <- gsub("\\d{2}", "", names(df))
@@ -15,37 +30,52 @@ map_counties.default <- function(bbox, decade) {
       COUNTYFP = str_sub(GEOID, 3, 5),
       decade = decade
     ) |>
-    distinct(STATEFP, COUNTYFP, decade, .keep_all = T) |>
+    distinct(STATEFP, COUNTYFP, decade, .keep_all = TRUE) |>
+    select(GEOID, STATEFP, COUNTYFP, decade, geometry) |>
     st_as_sf()
+  return(ct_std)
 }
 
-map_counties <- function(data, decade) {
-  UseMethod("map_counties", data)
-}
-
-map_tracts.default <- function(s, c, y) {
-  tracts(
+# function wrapped by `get_tracts_all_years()`
+# handles different vintages (and different column names) by default
+map_tracts <- function(s, c, y) {
+  tc <- tracts(
     state = s,
     county = c,
-    year = y,
-    progress_bar = F
-  ) |>
+    year = y
+  )
+
+  if ("GEOID" %in% names(tc)){
+    tc_std <- tc |>
+      select(-c(STATEFP, COUNTYFP)) |>
+      (\(df) {
+        names(df) <- gsub("\\d{2}", "", names(df))
+        df
+      })() |>
+      mutate(
+        STATEFP = str_sub(GEOID, 1, 2),
+        COUNTYFP = str_sub(GEOID, 3, 5),
+        decade = y
+      ) |>
+      select(GEOID, STATEFP, COUNTYFP, decade, geometry) |>
+      st_as_sf()
+    return(tc_std)
+  }
+
+  tc_std <- tc |>
     select(-c(STATEFP, COUNTYFP)) |>
     (\(df) {
       names(df) <- gsub("\\d{2}", "", names(df))
       df
-    })() |>
-    mutate(
-      STATEFP = str_sub(GEOID, 1, 2),
-      COUNTYFP = str_sub(GEOID, 3, 5),
-      decade = y
-    )
+    })()  |>
+    select(STATEFP, COUNTYFP, TRACTCE, geometry) |>
+    mutate(decade = y,
+           GEOID = paste0(STATEFP, COUNTYFP, TRACTCE)) |>
+    st_as_sf()
+  return(tc_std)
 }
 
-map_tracts <- function(s, c, y) {
-  UseMethod("map_tracts", s)
-}
-
+# iterate `map_counties()` over distinct combinations of years, then filter by event geography
 get_counties_all_years <- function(data, year) {
   message("Getting counties...")
   years <- dplyr::pull(data, {{ year }})
@@ -60,6 +90,7 @@ get_counties_all_years <- function(data, year) {
     st_filter(data)
 }
 
+# iterate `map_tracts()` over distinct combinations of state, county, and decade (returned by `get_counties_all_years()`)
 get_tracts_all_years <- function(ct) {
   message("Getting tracts...")
   tr <- purrr::pmap(

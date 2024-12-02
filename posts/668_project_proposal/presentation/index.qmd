@@ -1,0 +1,414 @@
+---
+title: "Quantifying the local impact of wildfire on demographic factors"
+author: "Harrison DeFord"
+format: revealjs
+bibliography: references.bib
+---
+
+# Introduction
+
+## Why this is important
+
+-   Since the advent of aircraft, land management policy has been to put out wildfires immediately, even in the face of ecosystem needs
+    -   Protection of people, property, and prosperity [@westover_2023_only]
+    -   Species such as lodgepole pine (*P. contorta*) and wild lupine (*L. perennis*) require fire
+
+## Why this is important
+
+-   Davies et al. [-@davies2018] found that majority Black, Hispanic, and Native American areas were disproportionately impacted by wildfire
+    -   About twice as vulnerable to wildfire impacts when compared to other census tracts
+
+------------------------------------------------------------------------
+
+![The Calf Canyon–Hermits Peak Complex Fire, as seen from Cimarron, N.M., June 15, 2022. The fire, the largest in state history, impacted the historically Latine communities of Ruidoso, Rociada, and Mora.](img/Calf_Canyon_from_philmont_cropped.jpg)
+
+------------------------------------------------------------------------
+
+```{r}
+#| echo: false
+#| output: false
+# Optionally source functions from `functions.R` script
+funs <- list.files(here::here("posts/668_project_proposal/R"), full.names = T)
+lapply(funs, source)
+```
+
+## Initial goals
+
+My initial goals for this project were to:
+
+-   Identify sources of spatial data related to historic wildfire perimeters
+-   Use ACS data to estimate impacts of disasters between Decennial Census years
+-   Create functions generic enough to apply to any disaster (or other) boundary
+
+# Data sources
+
+## Wildfire perimeters
+
+Historic wildfire GIS information is maintained by the National Interagency Fire Center (NIFC).
+
+NIFC data are distributed through ArcGIS Online products:
+
+-   Hosted feature layers
+-   Esri Hub ("Open Data") site
+
+These sources can be queried using the `{arcgislayers}` package [@arcgislayers].
+
+```{r}
+#| output: false
+#| echo: false
+library(tidycensus)
+library(tigris)
+library(sf)
+library(arcgislayers)
+library(tidyverse)
+library(patchwork)
+library(mapboxapi)
+options(tigris_use_cache = T)
+st_basemap <- tigris::states(cb = T,
+                             resolution = "20m") |>
+  shift_geometry()
+```
+
+## Census information
+
+The functions I've written for this project lean heavily on Kyle Walker's `{tigris}` [-@tigris] and `{tidycensus}` [-@tidycensus] packages.
+
+-   Increase performance by only downloading required counties and tracts
+-   Provide an easy spatial filter for NIFC data, by using the `filter_geom` argument in `arc_read()`
+
+# Gathering and cleaning wildfire data
+
+## Define the New Mexico boundary
+
+```{r}
+#| echo: true
+nm <- tigris::states() |>
+  filter(STUSPS == "NM") 
+```
+
+```{r}
+#| echo: false
+ggplot() +
+  geom_sf(data = st_basemap) +
+  geom_sf(data = nm,
+          fill = "#ad5044") +
+  theme_void()
+```
+
+## Get the wildfire perimeters
+
+```{r}
+#| echo: true
+nm_fires <- arcgislayers::arc_read(r"(https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/InterAgencyFirePerimeterHistory_All_Years_View/FeatureServer/0)",
+  where = "FIRE_YEAR BETWEEN 2010 AND 2020",
+  filter_geom = st_as_sfc(nm)
+) |>
+  st_make_valid(geos_method = "valid_linework") |>
+  distinct(toupper(INCIDENT), .keep_all = T) |>
+  slice_max(
+    order_by = Shape__Area,
+    n = 10
+  ) |>
+  select(-`toupper(INCIDENT)`) |>
+  mutate(COMMENTS = str_trunc(COMMENTS, 35))
+```
+
+::: callout-note
+The NIFC data is much less clean than the Census data; we have to validate geometry and de-duplicate incidents. In addition, many of the comment-writers had lots to say -- we'll truncate the `COMMENTS` field to 35 characters.
+:::
+
+## Put them together
+
+```{r fig.align='center'}
+mapview::mapview(nm,
+                 layer.name = "New Mexico",
+                 alpha.regions = 0,
+                 color = "#007A86",
+                 col.regions = "#007A86",
+                 lwd = 3,
+                 hover = NULL,
+                 label = "STUSPS") +
+mapview::mapview(nm_fires,
+                 layer.name = "Wildfires",
+                 color = "#ad5044",
+                 col.regions = "#ad5044",
+                 label = "INCIDENT")
+```
+
+The cumulative area of these fires is `r round(sum(nm_fires$Shape__Area)/2589988.110336, 2)` square miles. However, there are other impacts that are not apparent by only looking at the burned land area.
+
+# Relating demographic information to wildfire
+
+## Determining a temporal range
+
+-   An analyst must define what is meant by "before" and "after" an event, particularly when using 5-year ACS estimates
+    -   Default setting is 2 years before, 3 years after
+    -   Can be changed using `years_before` and `years_after` parameters, but must still be \>= 5 years
+
+## Finding intersecting counties and tracts
+
+-   To calculate the difference in demographic characteristics before and after an event, we'll use census tracts
+    -   Determine which tracts an event boundary intersects with before and after it occurs
+    -   `get_counties_all_years()` and `get_tracts_all_years()`
+        -   Use `st_filter()` to determine which tracts an event boundary intersects with
+
+## Relating tract data to events
+
+-   Each event in the input `sf` object is spatially joined to the tracts it intersects with before and after
+    -   A set of unique state, county, and year combinations is generated to improve performance
+    -   `map_data()` is applied to iterate `get_acs()` across these combinations
+        -   Common variables as well as user-defined variables
+
+## Summarize ACS data and join to events
+
+-   Most impactful events are large enough to affect more than one Census tract
+    -   Estimates are aggregated across event boundaries
+        -   Support for extensive and intensive variables is included
+
+## ACS Variables {.smaller}
+
+| Variable starts with... | Function to be computed |
+|-------------------------|-------------------------|
+| `mean`                  | `mean()`                |
+| `median`                | `median()`              |
+| All other strings       | `sum()`                 |
+
+Default variables include:
+
+```{r}
+#| echo: true
+#| eval: false
+c(
+      "pop_total" = "B03002_001", # total population
+      "pop_nh_white" = "B03002_003", # non-Hispanic White
+      "pop_nh_black" = "B03002_004", # non-Hispanic Black
+      "pop_nh_aian" = "B03002_005", # non-Hispanic American Indian/Alaskan Native
+      "pop_nh_asian" = "B03002_006", # non-Hispanic Asian
+      "pop_nh_hipi" = "B03002_007", # non-Hispanic Native Hawaiian And Other Pacific Islander
+      "pop_nh_other" = "B03002_008", # non-Hispanic Some Other Race Alone
+      "pop_nh_two" = "B03002_009", # non-Hispanic Two or More Races
+      "pop_hisp" = "B03002_012", # Hispanic or Latino
+      "median_hhi" = "B19013_001", # median household income
+      "mean_hh_size" = "B25010_001", # household size
+      "sch_enrollment" = "B14001_002" # school enrollment
+    )
+```
+
+## Calculating difference {.smaller}
+
+The final output object is an `sf` object, returned in either `"tidy"` (the default) or `"wide"` format.
+
+| `output = "tidy"` | `output = "wide"` |
+|------------------------------------|------------------------------------|
+| Twice as long as `nrow(data) * length(variables)`, with one field containing the point-in-time, one containing the corresponding ACS vintage year, one containing the variable, and one containing the estimate | Same length as `nrow(data)`, with a column returned for each variable requested and one denoting the years of the ACS vintages used |
+| No differences are calculated; the user must group and perform calculations | Absolute differences are calculated; this avoids divide by zero error |
+| Can be used for side-by-side comparison maps (such as a slider map) comparing an event to itself | Useful for single choropleth maps comparing events to one another |
+
+## "tidy" output {.scrollable}
+
+```{r}
+#| echo: true
+#| eval: true
+
+nm_fires_impact <- get_incident_impacts(
+  data = nm_fires,
+  id_col = OBJECTID,
+  year = FIRE_YEAR
+)
+```
+
+```{r}
+#| echo: false
+nm_fires_impact |>
+  slice(1:5) |>
+  st_drop_geometry() |>
+  gt::gt()
+```
+
+## "wide" output {.scrollable}
+
+```{r}
+#| echo: true
+#| eval: true
+
+nm_fires_impact_wide <- get_incident_impacts(
+  data = nm_fires,
+  id_col = OBJECTID,
+  year = FIRE_YEAR,
+  output = "wide"
+)
+```
+
+```{r}
+#| echo: false
+nm_fires_impact_wide |>
+  slice(1:5) |>
+  st_drop_geometry() |>
+  gt::gt()
+```
+
+## And some maps!
+
+```{r}
+nm_fires_impact_mhhi <- nm_fires_impact |>
+  filter(variable == "pop_hisp") |>
+  mutate(map_label = paste0(data_yr, ": ", computed))
+
+mapview::mapview(filter(nm_fires_impact_mhhi, 
+                        pt_in_time == "before"),
+                 layer.name = "Hispanic/Latino Population (Pre-event)",
+                 zcol = "computed",
+                 col.regions = RColorBrewer::brewer.pal(9,"YlGnBu"),
+                 label = "map_label",
+                 map.types = "CartoDB.Positron") | 
+  mapview::mapview(filter(nm_fires_impact_mhhi,
+                          pt_in_time == "after"),
+                 layer.name = "Hispanic/Latino Population (Post-event)",
+                 zcol = "computed",
+                 col.regions = RColorBrewer::brewer.pal(9,"YlGnBu"),
+                 label = "map_label",
+                 map.types = "CartoDB.Positron")
+```
+
+Using `output = "tidy"` allows us to compare one variable easily over time.
+
+## And more maps!
+
+```{r}
+nm_fires_impact_wide_hisp <- nm_fires_impact_wide |>
+  mutate(map_label = case_when(pop_hisp > 0 ~ paste0(acs_vintage, ": +", pop_hisp),
+                               TRUE ~ paste0(acs_vintage, ": ", pop_hisp))) |>
+  add_row(pop_hisp = -959)
+
+mapview::mapview(nm_fires_impact_wide_hisp,
+                 layer.name = "Change in Hispanic/Latino Population, Pre- vs. Post-event",
+                 zcol = "pop_hisp",
+                 col.regions = RColorBrewer::brewer.pal(9,"RdYlBu"),
+                 lwd = 0.5,
+                 label = "map_label",
+                 map.types = "CartoDB.Positron") 
+```
+
+Using `output = "wide"` allows us to compare differences in one variable easily across multiple events.
+
+# In Conclusion
+
+## Findings
+
+The Wallow Fire (2011) had the most severe impact on the Hispanic and Latino populations based on this methodology.
+
+-   Hispanic/Latino population decreased by 442 individuals between 2009 and 2014
+-   Total population decreased by over 4,300 people
+-   School enrollment decreased by 1,479 pupils.
+
+## Further applications
+
+The way that I've constructed this project allows it to be easily extended to other topics, not just wildfire:
+
+-   Other urban disasters, like flooding
+-   Positive events (like a new transit station opening)
+-   A novel polygon, to see change in a region over time
+
+## Difficulties and limitations
+
+-   Data is returned by `tigris` with different column names depending on the vintage used
+-   ACS estimates are only available from 2009, so impacts can only be calculated for events occurring in 2010 onwards
+-   Calculated differences (when `output = "wide"`) can only be absolute
+    -   If an initial state is 0, then a relative difference cannot be calculated
+
+## What the project does well
+
+-   Written in such a way it can be converted to a package relatively easily
+-   Provides a good counterpart to existing disaster planning tools
+    -   [OnTheMap for Emergency Management](https://onthemap.ces.census.gov/em/)
+-   Does not calculate an impact index
+    -   What is a negative social characteristic?
+
+## One last example
+
+The Washington Metropolitan Area Transit Authority (WMATA) opened a series of metro rail stations through Northern Virginia on July 26, 2014, in the Phase 1 extension of the Silver Line [@a2015_dulles]. These stations include Greensboro, McLean, Spring Hill, Tysons, and Wiehle–Reston East.
+
+Using the above methodology, we can investigate the question: **what was the impact of opening these stations on the surrounding areas?**
+
+## Using transit data
+
+According to the U.S. Department of Transportation, most pedestrians are willing to walk a quarter to a half a mile to a transit stop [-@nabors_2008_pedestrian]. We can compute a polygon for the upper bound of this estimate using the `mapboxapi` package.
+
+```{r}
+#| echo: true
+#| output: false
+wmata_stops <- st_read("data/wmata_silver_p1.gpkg", layer = "wmata_silver_p1")
+hf_mi_stops <- mb_isochrone(wmata_stops, 
+                            profile = "walking", 
+                            distance = c(805), 
+                            id_column = "stop_id") |>
+  mutate(stop_yr = 2014) |>
+  left_join(st_drop_geometry(select(wmata_stops, c(stop_id, stop_name))),
+            by = join_by(id == stop_id))
+```
+
+## Using transit data
+
+```{r}
+mapview::mapview(hf_mi_stops,
+                 layer.name = "Half-mile walk from Silver Line Phase 1 stations",
+                 label = "stop_name")
+```
+
+## Calculating differences over time
+
+```{r}
+#| echo: true
+wmata_impact <- get_incident_impacts(hf_mi_stops,
+                                     id,
+                                     stop_yr,
+                                     output = "tidy")
+
+```
+
+```{r}
+wmata_impact_tpop <- wmata_impact |>
+  filter(variable == "pop_total") |>
+  mutate(map_label = paste0(data_yr, ": ", computed))
+
+mapview::mapview(filter(wmata_impact_tpop, 
+                        pt_in_time == "before"),
+                 layer.name = "Total Population (before SL Phase 1)",
+                 zcol = "computed",
+                 col.regions = RColorBrewer::brewer.pal(9,"YlGnBu"),
+                 label = "map_label",
+                 map.types = "CartoDB.Positron") | 
+  mapview::mapview(filter(wmata_impact_tpop,
+                          pt_in_time == "after"),
+                 layer.name = "Total Population (after SL Phase 1)",
+                 zcol = "computed",
+                 col.regions = RColorBrewer::brewer.pal(9,"YlGnBu"),
+                 label = "map_label",
+                 map.types = "CartoDB.Positron")
+```
+
+## Calculating differences over time
+
+```{r}
+#| echo: true
+wmata_impact_wide <- get_incident_impacts(hf_mi_stops,
+                                     id,
+                                     stop_yr,
+                                     output = "wide")
+```
+
+```{r}
+wmata_impact_wide_tpop <- wmata_impact_wide |>
+  mutate(map_label = case_when(pop_total > 0 ~ paste0(acs_vintage, ": +", pop_total),
+                               TRUE ~ paste0(acs_vintage, ": ", pop_total)))
+
+mapview::mapview(wmata_impact_wide_tpop,
+                 layer.name = "Change in Total Population, Pre- vs. Post-SL Phase 1",
+                 zcol = "pop_total",
+                 col.regions = RColorBrewer::brewer.pal(9,"RdYlBu"),
+                 lwd = 0.5,
+                 label = "map_label",
+                 map.types = "CartoDB.Positron") 
+```
+
+## References {.smaller}

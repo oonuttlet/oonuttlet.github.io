@@ -1,9 +1,8 @@
 ---
 title: Quantifying the local impact of wildfire on demographic factors 
+author: Harrison DeFord
 bibliography: references.bib
-categories: 
-        - "umbc"
-        - "human geography"
+image: "presentation/img/Calf_Canyon_from_philmont_cropped.jpg"
 ---
 
 ## Introduction
@@ -45,12 +44,10 @@ As a demonstration, I'll use the ten largest New Mexican wildfires in the NIFC h
 
 ```{r}
 #| echo: false
+#| output: false
 # Optionally source functions from `functions.R` script
-source("R/functions.R")
-source("R/map_geogs.R")
-source("R/acs_data.R")
-source("R/tidying_functions.R")
-# Add more calls to source as needed
+funs <- list.files(here::here("posts/668_project_proposal/R"), full.names = T)
+lapply(funs, source)
 ```
 
 ```{r}
@@ -66,7 +63,7 @@ options(tigris_use_cache = T)
 
 ```{r, message=FALSE}
 # Example of tigris:
-nm <- tigris::states(progress_bar = F) |>
+nm <- tigris::states() |>
   dplyr::filter(STUSPS == "NM") |>
   st_as_sfc()
 # Example of arcgislayers:
@@ -76,8 +73,10 @@ nm_fires <- arcgislayers::arc_read(r"(https://services3.arcgis.com/T4QMspbfLg3qT
 ) |>
   st_make_valid() |>
   distinct(toupper(INCIDENT), .keep_all = T) |>
-  slice_max(order_by = Shape__Area,
-            n = 10) |>
+  slice_max(
+    order_by = Shape__Area,
+    n = 10
+  ) |>
   select(-`toupper(INCIDENT)`) |>
   mutate(COMMENTS = str_trunc(COMMENTS, 35))
 mapview::mapview(nm_fires)
@@ -89,7 +88,7 @@ mapview::mapview(nm_fires)
 options(scipen = 999)
 p1 <- nm_fires |>
   st_drop_geometry() |>
-  summarize(tot_ac = sum(Shape__Area)/4047, .by = FIRE_YEAR) |>
+  summarize(tot_ac = sum(Shape__Area) / 4047, .by = FIRE_YEAR) |>
   ggplot() +
   geom_bar(aes(x = FIRE_YEAR, , y = tot_ac), stat = "identity") +
   scale_x_discrete(breaks = seq(2010, 2020, by = 1)) +
@@ -147,34 +146,43 @@ When `output = "tidy"` (the default), differences are not computed and the infor
 #| fig.height: 8
 #| fig.align: center
 #| message: false
-nm_fires_impact <- get_incident_impacts(data = nm_fires, 
-                                        id_col = OBJECTID, 
-                                        year = FIRE_YEAR)
+nm_fires_impact <- get_incident_impacts(
+  data = nm_fires,
+  id_col = OBJECTID,
+  year = FIRE_YEAR
+)
 
 ggplot(filter(nm_fires_impact, str_starts(variable, "pop"))) +
   geom_line(aes(x = fct_rev(pt_in_time), y = computed, group = variable, color = variable)) +
-  xlab("Point in time")+
+  xlab("Point in time") +
   ylab("Estimated population") +
   labs(title = "Impacts of wildfires on population data") +
-  scale_color_discrete("Race/Ethnicity Category", labels = c("Hispanic/Latino",
-                                  "Non-Hispanic American Native",
-                                  "Non-Hispanic Asian",
-                                  "Non-Hispanic African-American",
-                                  "Non-Hispanic Pacific Islander",
-                                  "Non-Hispanic Other",
-                                  "Non-Hispanic Two or More",
-                                  "Non-Hispanic White",
-                                  "Total Population")) +
+  scale_color_discrete("Race/Ethnicity Category", labels = c(
+    "Hispanic/Latino",
+    "Non-Hispanic American Native",
+    "Non-Hispanic Asian",
+    "Non-Hispanic African-American",
+    "Non-Hispanic Pacific Islander",
+    "Non-Hispanic Other",
+    "Non-Hispanic Two or More",
+    "Non-Hispanic White",
+    "Total Population"
+  )) +
   facet_wrap(~INCIDENT, scales = "free_y", nrow = 5, ncol = 2)
 ```
 
 ```{r}
 #| message: false
-nm_fires_impact_wide <- get_incident_impacts(data = nm_fires,
-                                             id_col = OBJECTID,
-                                             year = FIRE_YEAR,
-                                             output = "wide")
+nm_fires_impact_wide <- get_incident_impacts(
+  data = nm_fires,
+  id_col = OBJECTID,
+  year = FIRE_YEAR,
+  output = "wide"
+)
 
 mapview::mapview(nm_fires_impact_wide,
-                 zcol = "median_hhi")
+  zcol = "median_hhi"
+)
 ```
+
+A presentation with more details, given in class, can be found [here](presentation/).
