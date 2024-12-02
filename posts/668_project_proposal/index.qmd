@@ -1,6 +1,8 @@
 ---
 title: Quantifying the local impact of wildfire on demographic factors 
-author: Harrison DeFord
+categories: 
+        - "umbc"
+        - "human geography"
 bibliography: references.bib
 image: "presentation/img/Calf_Canyon_from_philmont_cropped.jpg"
 ---
