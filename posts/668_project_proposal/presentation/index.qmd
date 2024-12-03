@@ -20,7 +20,7 @@ bibliography: references.bib
 
 ------------------------------------------------------------------------
 
-![The Calf Canyon–Hermits Peak Complex Fire, as seen from Cimarron, N.M., June 15, 2022. The fire, the largest in state history, impacted the historically Latine communities of Ruidoso, Rociada, and Mora.](img/Calf_Canyon_from_philmont_cropped.jpg)
+![The Calf Canyon–Hermits Peak Complex Fire, as seen from Cimarron, N.M., June 15, 2022. The fire, the largest in state history, impacted the historically Latine communities of Las Vegas, Rociada, and Mora.](img/Calf_Canyon_from_philmont_cropped.jpg)
 
 ------------------------------------------------------------------------
 
@@ -198,11 +198,11 @@ c(
 
 The final output object is an `sf` object, returned in either `"tidy"` (the default) or `"wide"` format.
 
-| `output = "tidy"` | `output = "wide"` |
+| `output = "tidy"`                                                                                                                                                                                               | `output = "wide"`                                                                                                                   |
 |------------------------------------|------------------------------------|
 | Twice as long as `nrow(data) * length(variables)`, with one field containing the point-in-time, one containing the corresponding ACS vintage year, one containing the variable, and one containing the estimate | Same length as `nrow(data)`, with a column returned for each variable requested and one denoting the years of the ACS vintages used |
-| No differences are calculated; the user must group and perform calculations | Absolute differences are calculated; this avoids divide by zero error |
-| Can be used for side-by-side comparison maps (such as a slider map) comparing an event to itself | Useful for single choropleth maps comparing events to one another |
+| No differences are calculated; the user must group and perform calculations                                                                                                                                     | Absolute differences are calculated; this avoids divide by zero error                                                               |
+| Can be used for side-by-side comparison maps (such as a slider map) comparing an event to itself                                                                                                                | Useful for single choropleth maps comparing events to one another                                                                   |
 
 ## "tidy" output {.scrollable}
 
