@@ -73,7 +73,7 @@ nm_fires <- arcgislayers::arc_read(r"(https://services3.arcgis.com/T4QMspbfLg3qT
   where = "FIRE_YEAR BETWEEN 2010 AND 2020",
   filter_geom = nm
 ) |>
-  st_make_valid() |>
+  st_make_valid(geos_method = "valid_linework") |>
   distinct(toupper(INCIDENT), .keep_all = T) |>
   slice_max(
     order_by = Shape__Area,
