@@ -148,12 +148,15 @@ When `output = "tidy"` (the default), differences are not computed and the infor
 #| fig.height: 8
 #| fig.align: center
 #| message: false
+#| output: false
 nm_fires_impact <- get_incident_impacts(
   data = nm_fires,
   id_col = OBJECTID,
   year = FIRE_YEAR
 )
+```
 
+```{r}
 ggplot(filter(nm_fires_impact, str_starts(variable, "pop"))) +
   geom_line(aes(x = fct_rev(pt_in_time), y = computed, group = variable, color = variable)) +
   xlab("Point in time") +
@@ -175,13 +178,15 @@ ggplot(filter(nm_fires_impact, str_starts(variable, "pop"))) +
 
 ```{r}
 #| message: false
+#| output: false
 nm_fires_impact_wide <- get_incident_impacts(
   data = nm_fires,
   id_col = OBJECTID,
   year = FIRE_YEAR,
   output = "wide"
 )
-
+```
+```{r}
 mapview::mapview(nm_fires_impact_wide,
   zcol = "median_hhi"
 )
